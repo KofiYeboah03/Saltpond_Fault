@@ -17,6 +17,12 @@
         const { useState, useEffect } = React;
         const { createClient } = supabase;
 
+        // Hardcoded credentials
+        const SUPABASE_URL = 'https://hbthoxkegukkzojluwml.supabase.co';
+        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhidGhveGtlZ3Vra3pvamx1d21sIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjMyMjI1OTgsImV4cCI6MjA3ODc5ODU5OH0.-Qh-doxIN54kQv7WqazsV8Mi2H7itVaF40QP9uGMKwc';
+        const CLOUDINARY_CLOUD_NAME = 'ds6b6yrkz';
+        const CLOUDINARY_UPLOAD_PRESET = 'ecg_faults_unsigned';
+
         // Lucide icons as inline SVG components
         const Calendar = () => <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>;
         const Clock = ({ className = "w-6 h-6" }) => <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>;
@@ -26,9 +32,9 @@
         const AlertCircle = () => <svg className="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>;
         const CheckCircle = ({ className = "w-12 h-12" }) => <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>;
         const Phone = () => <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" /></svg>;
-        const Building = () => <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" /></svg>;
         const Zap = () => <svg className="w-16 h-16 mx-auto text-yellow-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>;
-        const Settings = ({ className = "w-6 h-6" }) => <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /></svg>;
+        const Edit = () => <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>;
+        const Loader = () => <svg className="animate-spin h-5 w-5" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>;
 
         const LOCATIONS = [
           'Saltpond', 'Mankessim', 'Ekumfi', 'Biriwa', 'Egyaa No. 1', 
@@ -68,25 +74,21 @@
 
         const FaultTracker = () => {
           const [supabase, setSupabase] = useState(null);
-          const [isConfigured, setIsConfigured] = useState(false);
-          const [showConfig, setShowConfig] = useState(false);
-          const [supabaseUrl, setSupabaseUrl] = useState('');
-          const [supabaseKey, setSupabaseKey] = useState('');
-          const [cloudinaryCloudName, setCloudinaryCloudName] = useState('');
-          const [cloudinaryUploadPreset, setCloudinaryUploadPreset] = useState('');
-          
           const [userRole, setUserRole] = useState('');
           const [teamMember, setTeamMember] = useState('');
           const [faults, setFaults] = useState([]);
           const [tokens, setTokens] = useState([]);
           const [activeView, setActiveView] = useState('dashboard');
           const [loading, setLoading] = useState(false);
+          const [submitting, setSubmitting] = useState(false);
           const [authCode, setAuthCode] = useState('');
           const [authError, setAuthError] = useState('');
           const [periodType, setPeriodType] = useState('all');
           const [startDate, setStartDate] = useState('');
           const [endDate, setEndDate] = useState('');
           const [showAdvancedAnalytics, setShowAdvancedAnalytics] = useState(false);
+          const [editingFault, setEditingFault] = useState(null);
+          const [editReason, setEditReason] = useState('');
 
           const [newFault, setNewFault] = useState({
             source: '',
@@ -118,77 +120,48 @@
           });
 
           useEffect(() => {
-            // Pre-configured credentials - no setup screen needed
-            const defaultUrl = 'https://hbthoxkegukkzojluwml.supabase.co';
-            const defaultKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhidGhveGtlZ3Vra3pvamx1d21sIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjMyMjI1OTgsImV4cCI6MjA3ODc5ODU5OH0.-Qh-doxIN54kQv7WqazsV8Mi2H7itVaF40QP9uGMKwc';
-            const defaultCloudName = 'ds6b6yrkz';
-            const defaultUploadPreset = 'ecg_faults_unsigned';
-            
-            const savedUrl = localStorage.getItem('supabase_url') || defaultUrl;
-            const savedKey = localStorage.getItem('supabase_key') || defaultKey;
-            const savedCloudName = localStorage.getItem('cloudinary_cloud_name') || defaultCloudName;
-            const savedUploadPreset = localStorage.getItem('cloudinary_upload_preset') || defaultUploadPreset;
-            
-            setSupabaseUrl(savedUrl);
-            setSupabaseKey(savedKey);
-            setCloudinaryCloudName(savedCloudName);
-            setCloudinaryUploadPreset(savedUploadPreset);
-            
-            // Save defaults to localStorage if not already saved
-            if (!localStorage.getItem('supabase_url')) {
-              localStorage.setItem('supabase_url', defaultUrl);
-              localStorage.setItem('supabase_key', defaultKey);
-              localStorage.setItem('cloudinary_cloud_name', defaultCloudName);
-              localStorage.setItem('cloudinary_upload_preset', defaultUploadPreset);
-            }
-            
-            initializeSupabase(savedUrl, savedKey);
+            const client = createClient(SUPABASE_URL, SUPABASE_KEY);
+            setSupabase(client);
+            loadData(client);
           }, []);
 
-          const initializeSupabase = (url, key) => {
+          const loadData = async (client = supabase) => {
+            if (!client) return;
+            
+            setLoading(true);
             try {
-              const client = createClient(url, key);
-              setSupabase(client);
-              setIsConfigured(true);
-              setShowConfig(false);
-            } catch (error) {
-              console.error('Error initializing Supabase:', error);
-              alert('Error connecting to Supabase. Please check your credentials.');
-            }
-          };
+              const { data: faultsData, error: faultsError } = await client
+                .from('faults')
+                .select('*')
+                .order('created_at', { ascending: false });
 
-          const handleSaveConfig = () => {
-            if (!supabaseUrl || !supabaseKey) {
-              alert('Please enter both Supabase URL and API Key');
-              return;
+              if (faultsError) throw faultsError;
+
+              const { data: tokensData, error: tokensError } = await client
+                .from('tokens')
+                .select('*')
+                .order('timestamp', { ascending: false });
+
+              if (tokensError) throw tokensError;
+
+              setFaults(faultsData || []);
+              setTokens(tokensData || []);
+            } catch (error) {
+              console.error('Error loading data:', error);
+              alert('Error loading data from Supabase: ' + error.message);
             }
-            
-            localStorage.setItem('supabase_url', supabaseUrl);
-            localStorage.setItem('supabase_key', supabaseKey);
-            
-            if (cloudinaryCloudName && cloudinaryUploadPreset) {
-              localStorage.setItem('cloudinary_cloud_name', cloudinaryCloudName);
-              localStorage.setItem('cloudinary_upload_preset', cloudinaryUploadPreset);
-            }
-            
-            initializeSupabase(supabaseUrl, supabaseKey);
-            loadData();
+            setLoading(false);
           };
 
           const uploadToCloudinary = async (file) => {
-            if (!cloudinaryCloudName || !cloudinaryUploadPreset) {
-              alert('Cloudinary not configured. Photos will be skipped.');
-              return null;
-            }
-
             const formData = new FormData();
             formData.append('file', file);
-            formData.append('upload_preset', cloudinaryUploadPreset);
+            formData.append('upload_preset', CLOUDINARY_UPLOAD_PRESET);
             formData.append('folder', 'ecg-faults');
 
             try {
               const response = await fetch(
-                `https://api.cloudinary.com/v1_1/${cloudinaryCloudName}/image/upload`,
+                `https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/image/upload`,
                 {
                   method: 'POST',
                   body: formData
@@ -203,7 +176,7 @@
             }
           };
 
-          const handlePhotoUpload = async (e, type) => {
+          const handlePhotoUpload = async (e, type, isEdit = false) => {
             const file = e.target.files[0];
             if (!file) return;
 
@@ -212,18 +185,33 @@
               return;
             }
 
-            setNewFault(prev => ({
-              ...prev,
-              [type === 'before' ? 'uploadingPhotoBefore' : 'uploadingPhotoAfter']: true
-            }));
+            if (isEdit) {
+              setEditingFault(prev => ({
+                ...prev,
+                [type === 'before' ? 'uploadingPhotoBefore' : 'uploadingPhotoAfter']: true
+              }));
+            } else {
+              setNewFault(prev => ({
+                ...prev,
+                [type === 'before' ? 'uploadingPhotoBefore' : 'uploadingPhotoAfter']: true
+              }));
+            }
 
             const url = await uploadToCloudinary(file);
             
-            setNewFault(prev => ({
-              ...prev,
-              [type === 'before' ? 'photoBeforeUrl' : 'photoAfterUrl']: url || '',
-              [type === 'before' ? 'uploadingPhotoBefore' : 'uploadingPhotoAfter']: false
-            }));
+            if (isEdit) {
+              setEditingFault(prev => ({
+                ...prev,
+                [type === 'before' ? 'photo_before_url' : 'photo_after_url']: url || '',
+                [type === 'before' ? 'uploadingPhotoBefore' : 'uploadingPhotoAfter']: false
+              }));
+            } else {
+              setNewFault(prev => ({
+                ...prev,
+                [type === 'before' ? 'photoBeforeUrl' : 'photoAfterUrl']: url || '',
+                [type === 'before' ? 'uploadingPhotoBefore' : 'uploadingPhotoAfter']: false
+              }));
+            }
 
             if (url) {
               alert(`${type === 'before' ? 'Before' : 'After'} photo uploaded successfully!`);
@@ -250,50 +238,6 @@
             }
           };
 
-          const handleResetConfig = () => {
-            localStorage.removeItem('supabase_url');
-            localStorage.removeItem('supabase_key');
-            setSupabaseUrl('');
-            setSupabaseKey('');
-            setSupabase(null);
-            setIsConfigured(false);
-            setShowConfig(true);
-          };
-
-          useEffect(() => {
-            if (isConfigured && supabase) {
-              loadData();
-            }
-          }, [isConfigured, supabase]);
-
-          const loadData = async () => {
-            if (!supabase) return;
-            
-            setLoading(true);
-            try {
-              const { data: faultsData, error: faultsError } = await supabase
-                .from('faults')
-                .select('*')
-                .order('created_at', { ascending: false });
-
-              if (faultsError) throw faultsError;
-
-              const { data: tokensData, error: tokensError } = await supabase
-                .from('tokens')
-                .select('*')
-                .order('timestamp', { ascending: false });
-
-              if (tokensError) throw tokensError;
-
-              setFaults(faultsData || []);
-              setTokens(tokensData || []);
-            } catch (error) {
-              console.error('Error loading data:', error);
-              alert('Error loading data from Supabase: ' + error.message);
-            }
-            setLoading(false);
-          };
-
           const saveFault = async (fault) => {
             if (!supabase) return false;
             
@@ -318,7 +262,10 @@
                 comments: fault.comments || null,
                 photo_before_url: fault.photoBeforeUrl || null,
                 photo_after_url: fault.photoAfterUrl || null,
-                created_at: fault.createdAt
+                created_at: fault.createdAt,
+                edited: false,
+                edit_reason: null,
+                edited_at: null
               };
 
               const { error } = await supabase
@@ -332,6 +279,33 @@
             } catch (error) {
               console.error('Error saving fault:', error);
               alert('Error saving fault: ' + error.message);
+              return false;
+            }
+          };
+
+          const updateFault = async (faultId, updates, reason) => {
+            if (!supabase) return false;
+            
+            try {
+              const updateData = {
+                ...updates,
+                edited: true,
+                edit_reason: reason,
+                edited_at: new Date().toISOString()
+              };
+
+              const { error } = await supabase
+                .from('faults')
+                .update(updateData)
+                .eq('id', faultId);
+
+              if (error) throw error;
+
+              await loadData();
+              return true;
+            } catch (error) {
+              console.error('Error updating fault:', error);
+              alert('Error updating fault: ' + error.message);
               return false;
             }
           };
@@ -366,6 +340,8 @@
 
           const handleSubmitFault = async (e) => {
             e.preventDefault();
+            setSubmitting(true);
+            
             const fault = {
               ...newFault,
               teamMember: teamMember,
@@ -375,6 +351,8 @@
             };
             
             const success = await saveFault(fault);
+            setSubmitting(false);
+            
             if (success) {
               setNewFault({
                 source: '',
@@ -398,11 +376,14 @@
                 uploadingPhotoAfter: false
               });
               alert('Fault logged successfully!');
+              setActiveView('my-logs');
             }
           };
 
           const handleSubmitToken = async (e) => {
             e.preventDefault();
+            setSubmitting(true);
+            
             const token = {
               ...newToken,
               teamMember: teamMember,
@@ -411,6 +392,8 @@
             };
             
             const success = await saveToken(token);
+            setSubmitting(false);
+            
             if (success) {
               setNewToken({
                 meterNumber: '',
@@ -419,6 +402,56 @@
                 teamMember: ''
               });
               alert('Token generation logged successfully!');
+            }
+          };
+
+          const handleEditFault = (fault) => {
+            setEditingFault({
+              ...fault,
+              uploadingPhotoBefore: false,
+              uploadingPhotoAfter: false
+            });
+            setEditReason('');
+            setActiveView('edit-fault');
+          };
+
+          const handleSaveEdit = async (e) => {
+            e.preventDefault();
+            if (!editReason.trim()) {
+              alert('Please provide a reason for editing this log');
+              return;
+            }
+
+            setSubmitting(true);
+
+            const updates = {
+              source: editingFault.source,
+              location: editingFault.location,
+              meter_number: editingFault.meter_number,
+              customer_name: editingFault.customer_name,
+              customer_phone: editingFault.customer_phone,
+              priority: editingFault.priority,
+              reported_time: editingFault.reported_time,
+              departed_time: editingFault.departed_time,
+              arrived_time: editingFault.arrived_time,
+              resolved_time: editingFault.resolved_time,
+              fault_type: editingFault.fault_type,
+              lights_restored: editingFault.lights_restored,
+              parts_used: editingFault.parts_used,
+              comments: editingFault.comments,
+              photo_before_url: editingFault.photo_before_url,
+              photo_after_url: editingFault.photo_after_url,
+              status: editingFault.resolved_time ? 'resolved' : editingFault.arrived_time ? 'in-progress' : 'assigned'
+            };
+
+            const success = await updateFault(editingFault.id, updates, editReason);
+            setSubmitting(false);
+
+            if (success) {
+              setEditingFault(null);
+              setEditReason('');
+              alert('Fault updated successfully!');
+              setActiveView('my-logs');
             }
           };
 
@@ -495,210 +528,31 @@
             });
           };
 
+          const getTodayFaults = () => {
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            const tomorrow = new Date(today);
+            tomorrow.setDate(tomorrow.getDate() + 1);
+
+            return faults.filter(fault => {
+              const faultDate = new Date(fault.created_at);
+              return fault.team_member === teamMember && 
+                     faultDate >= today && 
+                     faultDate < tomorrow;
+            });
+          };
+
           const calculateAdvancedMetrics = () => {
             const filteredFaults = filterByDateRange(faults, 'created_at');
-            const filteredTokens = filterByDateRange(tokens, 'timestamp');
 
-            // 1. TREND ANALYSIS
             const getDayKey = (date) => new Date(date).toISOString().split('T')[0];
             const faultsByDay = filteredFaults.reduce((acc, fault) => {
               const day = getDayKey(fault.created_at);
               acc[day] = (acc[day] || 0) + 1;
               return acc;
             }, {});
-            
-            const sortedDays = Object.keys(faultsByDay).sort();
-            const dayOverDayGrowth = sortedDays.length > 1 
-              ? ((faultsByDay[sortedDays[sortedDays.length - 1]] - faultsByDay[sortedDays[sortedDays.length - 2]]) / faultsByDay[sortedDays[sortedDays.length - 2]] * 100)
-              : 0;
 
-            // 2. PERFORMANCE METRICS
-            const meterFaultCount = filteredFaults.reduce((acc, fault) => {
-              acc[fault.meter_number] = (acc[fault.meter_number] || 0) + 1;
-              return acc;
-            }, {});
-            
-            const repeatFaults = Object.values(meterFaultCount).filter(count => count > 1).length;
-            const repeatFaultRate = filteredFaults.length > 0 
-              ? (repeatFaults / Object.keys(meterFaultCount).length * 100)
-              : 0;
-
-            const resolvedFaults = filteredFaults.filter(f => f.status === 'resolved');
-            const firstTimeFixRate = resolvedFaults.length > 0
-              ? (resolvedFaults.filter(f => meterFaultCount[f.meter_number] === 1).length / resolvedFaults.length * 100)
-              : 0;
-
-            const faultHours = filteredFaults.map(f => new Date(f.created_at).getHours());
-            const peakHour = faultHours.length > 0
-              ? faultHours.reduce((acc, hour) => {
-                  acc[hour] = (acc[hour] || 0) + 1;
-                  return acc;
-                }, {})
-              : {};
-            const peakHourValue = Object.entries(peakHour).sort((a, b) => b[1] - a[1])[0] || ['N/A', 0];
-
-            const responseTimes = filteredFaults.map(getResponseTime).filter(t => t !== null).sort((a, b) => a - b);
-            const responseStats = {
-              min: responseTimes.length > 0 ? responseTimes[0] : 0,
-              max: responseTimes.length > 0 ? responseTimes[responseTimes.length - 1] : 0,
-              median: responseTimes.length > 0 ? responseTimes[Math.floor(responseTimes.length / 2)] : 0,
-              p95: responseTimes.length > 0 ? responseTimes[Math.floor(responseTimes.length * 0.95)] : 0
-            };
-
-            const resolutionByType = FAULT_TYPES.reduce((acc, type) => {
-              const typeFaults = resolvedFaults.filter(f => f.fault_type === type);
-              const times = typeFaults.map(getResolutionTime).filter(t => t !== null);
-              acc[type] = times.length > 0 ? Math.round(times.reduce((a, b) => a + b, 0) / times.length) : 0;
-              return acc;
-            }, {});
-
-            // 3. EFFICIENCY METRICS
-            const getTravelTime = (fault) => {
-              if (!fault.departed_time || !fault.arrived_time) return null;
-              const departed = new Date(fault.departed_time);
-              const arrived = new Date(fault.arrived_time);
-              return Math.round((arrived - departed) / (1000 * 60));
-            };
-
-            const travelTimes = filteredFaults.map(getTravelTime).filter(t => t !== null);
-            const avgTravelTime = travelTimes.length > 0
-              ? Math.round(travelTimes.reduce((a, b) => a + b, 0) / travelTimes.length)
-              : 0;
-
-            const tokenToFaultRatio = filteredFaults.length > 0
-              ? (filteredTokens.length / filteredFaults.length * 100)
-              : 0;
-
-            const teamEfficiency = TEAM_MEMBERS.reduce((acc, member) => {
-              const memberFaults = filteredFaults.filter(f => f.team_member === member);
-              const uniqueDays = new Set(memberFaults.map(f => getDayKey(f.created_at))).size;
-              const faultsPerDay = uniqueDays > 0 ? memberFaults.length / uniqueDays : 0;
-              
-              const memberResolved = memberFaults.filter(f => f.status === 'resolved');
-              const workingMinutes = memberResolved.map(f => {
-                if (!f.arrived_time || !f.resolved_time) return 0;
-                return (new Date(f.resolved_time) - new Date(f.arrived_time)) / (1000 * 60);
-              }).reduce((a, b) => a + b, 0);
-              
-              const faultsPerHour = workingMinutes > 0 ? (memberResolved.length / (workingMinutes / 60)) : 0;
-
-              acc[member] = {
-                faultsPerDay: faultsPerDay.toFixed(2),
-                faultsPerHour: faultsPerHour.toFixed(2),
-                totalWorkingHours: (workingMinutes / 60).toFixed(2)
-              };
-              return acc;
-            }, {});
-
-            // 4. PREDICTIVE INDICATORS
-            const highRiskMeters = Object.entries(meterFaultCount)
-              .filter(([meter, count]) => count >= 3)
-              .sort((a, b) => b[1] - a[1])
-              .slice(0, 10);
-
-            const locationRisk = LOCATIONS.reduce((acc, location) => {
-              const locationFaults = filteredFaults.filter(f => f.location === location);
-              const avgResolutionTime = locationFaults.length > 0
-                ? locationFaults.map(getResolutionTime).filter(t => t !== null).reduce((a, b) => a + b, 0) / locationFaults.length
-                : 0;
-              acc[location] = {
-                count: locationFaults.length,
-                avgResolution: avgResolutionTime
-              };
-              return acc;
-            }, {});
-
-            const faultTypesByLocation = LOCATIONS.reduce((acc, location) => {
-              const locationFaults = filteredFaults.filter(f => f.location === location);
-              const types = locationFaults.reduce((t, f) => {
-                if (f.fault_type) t[f.fault_type] = (t[f.fault_type] || 0) + 1;
-                return t;
-              }, {});
-              acc[location] = types;
-              return acc;
-            }, {});
-
-            // 5. COMPARATIVE ANALYTICS
-            const dayOfWeekStats = filteredFaults.reduce((acc, fault) => {
-              const day = new Date(fault.created_at).getDay();
-              const dayName = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'][day];
-              acc[dayName] = (acc[dayName] || 0) + 1;
-              return acc;
-            }, {});
-
-            const bestWorstDays = Object.entries(dayOfWeekStats).sort((a, b) => b[1] - a[1]);
-
-            // 6. QUALITY METRICS
-            const customerSatisfaction = TEAM_MEMBERS.reduce((acc, member) => {
-              const memberResolved = resolvedFaults.filter(f => f.team_member === member);
-              const lightsRestored = memberResolved.filter(f => f.lights_restored === true).length;
-              acc[member] = memberResolved.length > 0 ? (lightsRestored / memberResolved.length * 100).toFixed(1) : 0;
-              return acc;
-            }, {});
-
-            const recurrentMeters = Object.entries(meterFaultCount).filter(([m, c]) => c > 2).length;
-            const faultRecurrenceRate = Object.keys(meterFaultCount).length > 0
-              ? (recurrentMeters / Object.keys(meterFaultCount).length * 100)
-              : 0;
-
-            return {
-              trend: {
-                dayOverDayGrowth: dayOverDayGrowth.toFixed(1),
-                faultsByDay
-              },
-              performance: {
-                firstTimeFixRate: firstTimeFixRate.toFixed(1),
-                repeatFaultRate: repeatFaultRate.toFixed(1),
-                peakHour: `${peakHourValue[0]}:00 (${peakHourValue[1]} faults)`,
-                responseStats,
-                resolutionByType
-              },
-              efficiency: {
-                avgTravelTime,
-                tokenToFaultRatio: tokenToFaultRatio.toFixed(1),
-                teamEfficiency
-              },
-              predictive: {
-                highRiskMeters,
-                locationRisk,
-                faultTypesByLocation
-              },
-              comparative: {
-                dayOfWeekStats,
-                bestDay: bestWorstDays[0] || ['N/A', 0],
-                worstDay: bestWorstDays[bestWorstDays.length - 1] || ['N/A', 0]
-              },
-              quality: {
-                customerSatisfaction,
-                faultRecurrenceRate: faultRecurrenceRate.toFixed(1)
-              }
-            };
-          };
-
-          const exportToCSV = () => {
-            const filteredFaults = filterByDateRange(faults, 'created_at');
-            const filteredTokens = filterByDateRange(tokens, 'timestamp');
-            
-            let csv = 'FAULTS REPORT\n\n';
-            csv += 'ID,Meter Number,Location,Source,Team Member,Status,Reported Time,Departed Time,Arrived Time,Resolved Time,Fault Type,Lights Restored,Response Time (min),Resolution Time (min)\n';
-            
-            filteredFaults.forEach(fault => {
-              csv += `${fault.id},${fault.meter_number},${fault.location},${fault.source},${fault.team_member},${fault.status},${fault.reported_time},${fault.departed_time || ''},${fault.arrived_time || ''},${fault.resolved_time || ''},${fault.fault_type || ''},${fault.lights_restored},${getResponseTime(fault) || ''},${getResolutionTime(fault) || ''}\n`;
-            });
-            
-            csv += '\n\nTOKENS REPORT\n\n';
-            csv += 'ID,Meter Number,Location,Reason,Team Member,Timestamp\n';
-            
-            filteredTokens.forEach(token => {
-              csv += `${token.id},${token.meter_number},${token.location},${token.reason || ''},${token.team_member},${token.timestamp}\n`;
-            });
-
-            const blob = new Blob([csv], { type: 'text/csv' });
-            const url = window.URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `ECG_Saltpond_Report_${new Date().toISOString().split('T')[0]}.csv`;
-            a.click();
+            return { trend: { faultsByDay } };
           };
 
           const generateStats = () => {
@@ -713,25 +567,11 @@
             const avgResponseTime = responseTimes.length > 0 
               ? Math.round(responseTimes.reduce((a, b) => a + b, 0) / responseTimes.length)
               : 0;
-            
-            const avgResolutionTime = resolutionTimes.length > 0
-              ? Math.round(resolutionTimes.reduce((a, b) => a + b, 0) / resolutionTimes.length)
-              : 0;
 
             const lightsRestoredCount = resolvedFaults.filter(f => f.lights_restored === true).length;
             const lightsRestoredRate = resolvedFaults.length > 0 
               ? Math.round((lightsRestoredCount / resolvedFaults.length) * 100)
               : 0;
-
-            const channelStats = FAULT_SOURCES.reduce((acc, source) => {
-              acc[source] = filteredFaults.filter(f => f.source === source).length;
-              return acc;
-            }, {});
-
-            const locationStats = LOCATIONS.reduce((acc, location) => {
-              acc[location] = filteredFaults.filter(f => f.location === location).length;
-              return acc;
-            }, {});
 
             const teamStats = TEAM_MEMBERS.reduce((acc, member) => {
               const memberFaults = filteredFaults.filter(f => f.team_member === member);
@@ -747,129 +587,39 @@
             return {
               total: filteredFaults.length,
               resolved: resolvedFaults.length,
-              inProgress: filteredFaults.filter(f => f.status === 'in-progress').length,
               avgResponseTime,
-              avgResolutionTime,
               lightsRestoredRate,
-              channelStats,
-              locationStats,
               teamStats,
               totalTokens: filteredTokens.length
             };
           };
 
-          if (!isConfigured || showConfig) {
-            return (
-              <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-4 flex items-center justify-center">
-                <div className="max-w-md w-full bg-white rounded-lg shadow-xl p-8">
-                  <div className="text-center mb-6">
-                    <Settings className="w-16 h-16 mx-auto text-blue-600 mb-4" />
-                    <h1 className="text-2xl font-bold text-gray-800">Supabase Configuration</h1>
-                    <p className="text-gray-600 mt-2">Connect to your Supabase database</p>
-                  </div>
+          const getPeriodLabel = () => {
+            const labels = {
+              'all': 'All Time',
+              'today': 'Today',
+              'yesterday': 'Yesterday',
+              'this-week': 'This Week',
+              'last-week': 'Last Week',
+              'this-month': 'This Month',
+              'last-month': 'Last Month',
+              'this-quarter': 'This Quarter',
+              'this-year': 'This Year',
+              'custom': 'Custom Period'
+            };
+            return labels[periodType] || 'All Time';
+          };
 
-                  <div className="space-y-4">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Supabase Project URL
-                      </label>
-                      <input
-                        type="text"
-                        value={supabaseUrl}
-                        onChange={(e) => setSupabaseUrl(e.target.value)}
-                        placeholder="https://your-project.supabase.co"
-                        className="w-full border border-gray-300 rounded-lg p-3"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Supabase Anon/Public Key
-                      </label>
-                      <input
-                        type="password"
-                        value={supabaseKey}
-                        onChange={(e) => setSupabaseKey(e.target.value)}
-                        placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
-                        className="w-full border border-gray-300 rounded-lg p-3"
-                      />
-                    </div>
-
-                    <div className="border-t pt-4 mt-4">
-                      <h3 className="text-lg font-semibold text-gray-800 mb-3"> Cloudinary Setup (Optional but Recommended)</h3>
-                      <p className="text-sm text-gray-600 mb-3">For photo uploads: 25GB FREE storage</p>
-                      
-                      <div className="mb-3">
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                          Cloudinary Cloud Name
-                        </label>
-                        <input
-                          type="text"
-                          value={cloudinaryCloudName}
-                          onChange={(e) => setCloudinaryCloudName(e.target.value)}
-                          placeholder="your-cloud-name"
-                          className="w-full border border-gray-300 rounded-lg p-3"
-                        />
-                      </div>
-
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                          Upload Preset (unsigned)
-                        </label>
-                        <input
-                          type="text"
-                          value={cloudinaryUploadPreset}
-                          onChange={(e) => setCloudinaryUploadPreset(e.target.value)}
-                          placeholder="your_upload_preset"
-                          className="w-full border border-gray-300 rounded-lg p-3"
-                        />
-                      </div>
-                    </div>
-
-                    <button
-                      onClick={handleSaveConfig}
-                      className="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition font-semibold"
-                    >
-                      Connect to Supabase
-                    </button>
-
-                    <div className="mt-6 p-4 bg-yellow-50 rounded-lg">
-                      <p className="text-sm text-yellow-800">
-                        <strong>Setup Instructions:</strong>
-                      </p>
-                      <ol className="text-sm text-yellow-800 mt-2 space-y-1 list-decimal list-inside">
-                        <li>Create Supabase account at supabase.com</li>
-                        <li>Create a new project and run the SQL schema</li>
-                        <li>Get Project URL and API Key from Settings → API</li>
-                        <li><strong>Optional:</strong> Create Cloudinary account at cloudinary.com</li>
-                        <li><strong>Optional:</strong> Get Cloud Name from Dashboard</li>
-                        <li><strong>Optional:</strong> Create unsigned upload preset in Settings</li>
-                      </ol>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            );
-          }
-
+          // Login screen
           if (!userRole || (userRole === 'field' && !teamMember)) {
             return (
               <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-4">
                 <div className="max-w-md mx-auto mt-20">
                   <div className="bg-white rounded-lg shadow-xl p-8">
-                    <div className="flex justify-between items-center mb-6">
-                      <div className="text-center flex-1">
-                        <Zap />
-                        <h1 className="text-2xl font-bold text-gray-800">ECG Saltpond</h1>
-                        <p className="text-gray-600">Fault Tracking System</p>
-                      </div>
-                      <button
-                        onClick={() => setShowConfig(true)}
-                        className="text-gray-400 hover:text-gray-600"
-                        title="Reconfigure Supabase"
-                      >
-                        <Settings />
-                      </button>
+                    <div className="text-center mb-6">
+                      <Zap />
+                      <h1 className="text-2xl font-bold text-gray-800">ECG Saltpond</h1>
+                      <p className="text-gray-600">Fault Tracking System</p>
                     </div>
                     
                     <div className="space-y-4">
@@ -898,56 +648,337 @@
                       </button>
                     </div>
                   </div>
-
-                  {faults.length > 0 && (
-                    <div className="bg-white rounded-lg shadow-xl p-6 mt-6">
-                      <h2 className="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
-                        <Calendar />
-                        Recent Faults
-                      </h2>
-                      <div className="space-y-3">
-                        {faults
-                          .slice(0, 10)
-                          .map((fault) => (
-                            <div key={fault.id} className="bg-gray-50 rounded-lg p-4 border-l-4 border-blue-500">
-                              <div className="flex flex-wrap justify-between items-start gap-2 mb-2">
-                                <div>
-                                  <span className="font-semibold text-gray-800">
-                                    Meter: {fault.meter_number}
-                                  </span>
-                                  <span className="text-gray-600 ml-2">• {fault.location}</span>
-                                </div>
-                                <span
-                                  className={`px-3 py-1 rounded-full text-sm font-semibold ${
-                                    fault.status === 'resolved'
-                                      ? 'bg-green-100 text-green-700'
-                                      : fault.status === 'in-progress'
-                                      ? 'bg-yellow-100 text-yellow-700'
-                                      : 'bg-gray-100 text-gray-700'
-                                  }`}
-                                >
-                                  {fault.status === 'resolved' ? 'Resolved' : fault.status === 'in-progress' ? 'In Progress' : 'Assigned'}
-                                </span>
-                              </div>
-                              <div className="grid grid-cols-2 gap-2 text-sm text-gray-600">
-                                <div>
-                                  <span className="font-semibold">Team:</span> {fault.team_member}
-                                </div>
-                                <div>
-                                  <span className="font-semibold">Source:</span> {fault.source}
-                                </div>
-                              </div>
-                            </div>
-                          ))}
-                      </div>
-                    </div>
-                  )}
                 </div>
               </div>
             );
           }
 
+          // Field team member view
           if (userRole === 'field') {
+            const todayFaults = getTodayFaults();
+
+            if (activeView === 'edit-fault' && editingFault) {
+              return (
+                <div className="min-h-screen bg-gray-50 p-4">
+                  <div className="max-w-2xl mx-auto">
+                    <div className="bg-white rounded-lg shadow-lg p-6">
+                      <div className="flex justify-between items-center mb-6">
+                        <div>
+                          <h1 className="text-2xl font-bold text-gray-800">Edit Fault Log</h1>
+                          <p className="text-gray-600">Logged in as: {teamMember}</p>
+                        </div>
+                        <button
+                          onClick={() => {
+                            setEditingFault(null);
+                            setEditReason('');
+                            setActiveView('my-logs');
+                          }}
+                          className="text-sm text-blue-600 hover:underline"
+                        >
+                          Back to My Logs
+                        </button>
+                      </div>
+
+                      <form onSubmit={handleSaveEdit} className="space-y-4">
+                        <div className="bg-orange-50 p-4 rounded-lg mb-4">
+                          <h2 className="text-lg font-bold text-orange-800">✏️ Edit Fault Log</h2>
+                          <p className="text-sm text-orange-600">Meter: {editingFault.meter_number}</p>
+                        </div>
+
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-2">
+                            Reason for Edit *
+                          </label>
+                          <textarea
+                            required
+                            value={editReason}
+                            onChange={(e) => setEditReason(e.target.value)}
+                            className="w-full border border-gray-300 rounded-lg p-3"
+                            rows="2"
+                            placeholder="Why are you editing this log?"
+                          ></textarea>
+                        </div>
+
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-2">
+                            Priority Level *
+                          </label>
+                          <select
+                            required
+                            value={editingFault.priority}
+                            onChange={(e) => setEditingFault({...editingFault, priority: e.target.value})}
+                            className="w-full border border-gray-300 rounded-lg p-3"
+                          >
+                            {PRIORITY_LEVELS.map(level => (
+                              <option key={level} value={level}>{level}</option>
+                            ))}
+                          </select>
+                        </div>
+
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-2">
+                            Fault Source *
+                          </label>
+                          <select
+                            required
+                            value={editingFault.source}
+                            onChange={(e) => setEditingFault({...editingFault, source: e.target.value})}
+                            className="w-full border border-gray-300 rounded-lg p-3"
+                          >
+                            {FAULT_SOURCES.map(source => (
+                              <option key={source} value={source}>{source}</option>
+                            ))}
+                          </select>
+                        </div>
+
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-2">
+                            Customer Name
+                          </label>
+                          <input
+                            type="text"
+                            value={editingFault.customer_name || ''}
+                            onChange={(e) => setEditingFault({...editingFault, customer_name: e.target.value})}
+                            className="w-full border border-gray-300 rounded-lg p-3"
+                          />
+                        </div>
+
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-2">
+                            Customer Phone *
+                          </label>
+                          <input
+                            type="tel"
+                            required
+                            value={editingFault.customer_phone || ''}
+                            onChange={(e) => setEditingFault({...editingFault, customer_phone: e.target.value})}
+                            className="w-full border border-gray-300 rounded-lg p-3"
+                          />
+                        </div>
+
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-2">
+                            Location *
+                          </label>
+                          <select
+                            required
+                            value={editingFault.location}
+                            onChange={(e) => setEditingFault({...editingFault, location: e.target.value})}
+                            className="w-full border border-gray-300 rounded-lg p-3"
+                          >
+                            {LOCATIONS.map(location => (
+                              <option key={location} value={location}>{location}</option>
+                            ))}
+                          </select>
+                        </div>
+
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-2">
+                            Time Reported *
+                          </label>
+                          <input
+                            type="datetime-local"
+                            required
+                            value={editingFault.reported_time}
+                            onChange={(e) => setEditingFault({...editingFault, reported_time: e.target.value})}
+                            className="w-full border border-gray-300 rounded-lg p-3"
+                          />
+                        </div>
+
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-2">
+                            Time Departed
+                          </label>
+                          <input
+                            type="datetime-local"
+                            value={editingFault.departed_time || ''}
+                            onChange={(e) => setEditingFault({...editingFault, departed_time: e.target.value})}
+                            className="w-full border border-gray-300 rounded-lg p-3"
+                          />
+                        </div>
+
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-2">
+                            Time Arrived
+                          </label>
+                          <input
+                            type="datetime-local"
+                            value={editingFault.arrived_time || ''}
+                            onChange={(e) => setEditingFault({...editingFault, arrived_time: e.target.value})}
+                            className="w-full border border-gray-300 rounded-lg p-3"
+                          />
+                        </div>
+
+                        {editingFault.arrived_time && (
+                          <>
+                            <div>
+                              <label className="block text-sm font-medium text-gray-700 mb-2">
+                                📷 Photo - Before Work
+                              </label>
+                              <input
+                                type="file"
+                                accept="image/*"
+                                onChange={(e) => handlePhotoUpload(e, 'before', true)}
+                                className="w-full border border-gray-300 rounded-lg p-3"
+                                disabled={editingFault.uploadingPhotoBefore}
+                              />
+                              {editingFault.uploadingPhotoBefore && (
+                                <p className="text-sm text-blue-600 mt-1">Uploading...</p>
+                              )}
+                              {editingFault.photo_before_url && (
+                                <div className="mt-2">
+                                  <img src={editingFault.photo_before_url} alt="Before" className="w-32 h-32 object-cover rounded border" />
+                                </div>
+                              )}
+                            </div>
+
+                            <div>
+                              <label className="block text-sm font-medium text-gray-700 mb-2">
+                                Fault Type
+                              </label>
+                              <select
+                                value={editingFault.fault_type || ''}
+                                onChange={(e) => setEditingFault({...editingFault, fault_type: e.target.value})}
+                                className="w-full border border-gray-300 rounded-lg p-3"
+                              >
+                                <option value="">Select fault type</option>
+                                {FAULT_TYPES.map(type => (
+                                  <option key={type} value={type}>{type}</option>
+                                ))}
+                              </select>
+                            </div>
+
+                            <div>
+                              <label className="block text-sm font-medium text-gray-700 mb-2">
+                                Parts Used
+                              </label>
+                              <select
+                                value={editingFault.parts_used || ''}
+                                onChange={(e) => setEditingFault({...editingFault, parts_used: e.target.value})}
+                                className="w-full border border-gray-300 rounded-lg p-3"
+                              >
+                                <option value="">Select parts used</option>
+                                {COMMON_PARTS.map(part => (
+                                  <option key={part} value={part}>{part}</option>
+                                ))}
+                              </select>
+                            </div>
+
+                            <div>
+                              <label className="block text-sm font-medium text-gray-700 mb-2">
+                                Comments
+                              </label>
+                              <textarea
+                                value={editingFault.comments || ''}
+                                onChange={(e) => setEditingFault({...editingFault, comments: e.target.value})}
+                                className="w-full border border-gray-300 rounded-lg p-3"
+                                rows="3"
+                              ></textarea>
+                            </div>
+
+                            <div>
+                              <label className="block text-sm font-medium text-gray-700 mb-2">
+                                Time Resolved
+                              </label>
+                              <input
+                                type="datetime-local"
+                                value={editingFault.resolved_time || ''}
+                                onChange={(e) => setEditingFault({...editingFault, resolved_time: e.target.value})}
+                                className="w-full border border-gray-300 rounded-lg p-3"
+                              />
+                            </div>
+
+                            {editingFault.resolved_time && (
+                              <>
+                                <div>
+                                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                                    📷 Photo - After Work
+                                  </label>
+                                  <input
+                                    type="file"
+                                    accept="image/*"
+                                    onChange={(e) => handlePhotoUpload(e, 'after', true)}
+                                    className="w-full border border-gray-300 rounded-lg p-3"
+                                    disabled={editingFault.uploadingPhotoAfter}
+                                  />
+                                  {editingFault.uploadingPhotoAfter && (
+                                    <p className="text-sm text-blue-600 mt-1">Uploading...</p>
+                                  )}
+                                  {editingFault.photo_after_url && (
+                                    <div className="mt-2">
+                                      <img src={editingFault.photo_after_url} alt="After" className="w-32 h-32 object-cover rounded border" />
+                                    </div>
+                                  )}
+                                </div>
+
+                                <div>
+                                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                                    Customer Has Lights?
+                                  </label>
+                                  <div className="flex gap-4">
+                                    <button
+                                      type="button"
+                                      onClick={() => setEditingFault({...editingFault, lights_restored: true})}
+                                      className={`flex-1 py-3 rounded-lg transition ${
+                                        editingFault.lights_restored === true
+                                          ? 'bg-green-600 text-white'
+                                          : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                                      }`}
+                                    >
+                                      Yes
+                                    </button>
+                                    <button
+                                      type="button"
+                                      onClick={() => setEditingFault({...editingFault, lights_restored: false})}
+                                      className={`flex-1 py-3 rounded-lg transition ${
+                                        editingFault.lights_restored === false
+                                          ? 'bg-red-600 text-white'
+                                          : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                                      }`}
+                                    >
+                                      No
+                                    </button>
+                                  </div>
+                                </div>
+                              </>
+                            )}
+                          </>
+                        )}
+
+                        <div className="flex gap-2">
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setEditingFault(null);
+                              setEditReason('');
+                              setActiveView('my-logs');
+                            }}
+                            className="flex-1 bg-gray-200 text-gray-700 py-4 rounded-lg hover:bg-gray-300 transition font-semibold"
+                          >
+                            Cancel
+                          </button>
+                          <button
+                            type="submit"
+                            disabled={submitting}
+                            className="flex-1 bg-orange-600 text-white py-4 rounded-lg hover:bg-orange-700 transition font-semibold flex items-center justify-center gap-2 disabled:bg-gray-400 disabled:cursor-not-allowed"
+                          >
+                            {submitting ? (
+                              <>
+                                <Loader />
+                                Saving...
+                              </>
+                            ) : (
+                              'Save Changes'
+                            )}
+                          </button>
+                        </div>
+                      </form>
+                    </div>
+                  </div>
+                </div>
+              );
+            }
+
             return (
               <div className="min-h-screen bg-gray-50 p-4">
                 <div className="max-w-2xl mx-auto">
@@ -957,24 +988,15 @@
                         <h1 className="text-2xl font-bold text-gray-800">Field Entry</h1>
                         <p className="text-gray-600">Logged in as: {teamMember}</p>
                       </div>
-                      <div className="flex gap-2">
-                        <button
-                          onClick={() => setShowConfig(true)}
-                          className="text-gray-400 hover:text-gray-600"
-                          title="Reconfigure Supabase"
-                        >
-                          <Settings className="w-5 h-5" />
-                        </button>
-                        <button
-                          onClick={() => {
-                            setUserRole('');
-                            setTeamMember('');
-                          }}
-                          className="text-sm text-blue-600 hover:underline"
-                        >
-                          Logout
-                        </button>
-                      </div>
+                      <button
+                        onClick={() => {
+                          setUserRole('');
+                          setTeamMember('');
+                        }}
+                        className="text-sm text-blue-600 hover:underline"
+                      >
+                        Logout
+                      </button>
                     </div>
 
                     <div className="flex gap-2 mb-6">
@@ -998,9 +1020,82 @@
                       >
                         Log Token
                       </button>
+                      <button
+                        onClick={() => setActiveView('my-logs')}
+                        className={`flex-1 py-3 rounded-lg transition ${
+                          activeView === 'my-logs'
+                            ? 'bg-purple-600 text-white' 
+                            : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                        }`}
+                      >
+                        My Logs ({todayFaults.length})
+                      </button>
                     </div>
 
-                    {activeView === 'log-fault' ? (
+                    {activeView === 'my-logs' && (
+                      <div className="space-y-4">
+                        <div className="bg-purple-50 p-4 rounded-lg mb-4">
+                          <h2 className="text-lg font-bold text-purple-800">Today's Faults</h2>
+                          <p className="text-sm text-purple-600">Total: {todayFaults.length} faults logged</p>
+                        </div>
+
+                        {todayFaults.length === 0 ? (
+                          <div className="text-center py-8 text-gray-500">
+                            <p>No faults logged today</p>
+                          </div>
+                        ) : (
+                          todayFaults.map((fault) => (
+                            <div key={fault.id} className="bg-white border border-gray-200 rounded-lg p-4 shadow-sm">
+                              <div className="flex justify-between items-start mb-3">
+                                <div>
+                                  <p className="font-bold text-gray-800">Meter: {fault.meter_number}</p>
+                                  <p className="text-sm text-gray-600">{fault.location}</p>
+                                  {fault.customer_name && (
+                                    <p className="text-sm text-gray-600">{fault.customer_name}</p>
+                                  )}
+                                </div>
+                                <div className="flex flex-col gap-2">
+                                  <span
+                                    className={`px-3 py-1 rounded-full text-xs font-semibold ${
+                                      fault.status === 'resolved'
+                                        ? 'bg-green-100 text-green-700'
+                                        : fault.status === 'in-progress'
+                                        ? 'bg-yellow-100 text-yellow-700'
+                                        : 'bg-gray-100 text-gray-700'
+                                    }`}
+                                  >
+                                    {fault.status === 'resolved' ? 'Resolved' : fault.status === 'in-progress' ? 'In Progress' : 'Assigned'}
+                                  </span>
+                                  {fault.edited && (
+                                    <span className="px-2 py-1 rounded-full text-xs font-semibold bg-orange-100 text-orange-700">
+                                      Edited
+                                    </span>
+                                  )}
+                                </div>
+                              </div>
+
+                              <div className="grid grid-cols-2 gap-2 text-sm text-gray-600 mb-3">
+                                <div><span className="font-semibold">Priority:</span> {fault.priority}</div>
+                                <div><span className="font-semibold">Source:</span> {fault.source}</div>
+                                {fault.fault_type && (
+                                  <div className="col-span-2"><span className="font-semibold">Type:</span> {fault.fault_type}</div>
+                                )}
+                              </div>
+
+                              <button
+                                onClick={() => handleEditFault(fault)}
+                                className="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition flex items-center justify-center gap-2"
+                              >
+                                <Edit />
+                                Edit This Log
+                              </button>
+                            </div>
+                          ))
+                        )}
+                      </div>
+                    )}
+
+                    {activeView === 'log-fault' && (
                       <form onSubmit={handleSubmitFault} className="space-y-4">
                         <div className="bg-blue-50 p-3 rounded-lg mb-4">
                           <p className="text-sm font-semibold text-blue-800">📋 Fault Information</p>
@@ -1043,7 +1138,7 @@
                         </div>
 
                         <div className="bg-green-50 p-3 rounded-lg mb-4 mt-4">
-                          <p className="text-sm font-semibold text-green-800"> Customer Information</p>
+                          <p className="text-sm font-semibold text-green-800">👤 Customer Information</p>
                         </div>
 
                         <div>
@@ -1149,7 +1244,7 @@
 
                             <div>
                               <label className="block text-sm font-medium text-gray-700 mb-2">
-                                 Photo - Before Work
+                                📷 Photo - Before Work
                               </label>
                               <input
                                 type="file"
@@ -1230,7 +1325,7 @@
                               <>
                                 <div>
                                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                                     Photo - After Work
+                                    📷 Photo - After Work
                                   </label>
                                   <input
                                     type="file"
@@ -1286,12 +1381,22 @@
 
                         <button
                           type="submit"
-                          className="w-full bg-blue-600 text-white py-4 rounded-lg hover:bg-blue-700 transition font-semibold"
+                          disabled={submitting}
+                          className="w-full bg-blue-600 text-white py-4 rounded-lg hover:bg-blue-700 transition font-semibold flex items-center justify-center gap-2 disabled:bg-gray-400 disabled:cursor-not-allowed"
                         >
-                          Submit Fault Report
+                          {submitting ? (
+                            <>
+                              <Loader />
+                              Submitting Fault Report...
+                            </>
+                          ) : (
+                            'Submit Fault Report'
+                          )}
                         </button>
                       </form>
-                    ) : (
+                    )}
+
+                    {activeView === 'log-token' && (
                       <form onSubmit={handleSubmitToken} className="space-y-4">
                         <div>
                           <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -1339,9 +1444,17 @@
 
                         <button
                           type="submit"
-                          className="w-full bg-green-600 text-white py-4 rounded-lg hover:bg-green-700 transition font-semibold"
+                          disabled={submitting}
+                          className="w-full bg-green-600 text-white py-4 rounded-lg hover:bg-green-700 transition font-semibold flex items-center justify-center gap-2 disabled:bg-gray-400 disabled:cursor-not-allowed"
                         >
-                          Log Token Generation
+                          {submitting ? (
+                            <>
+                              <Loader />
+                              Logging Token...
+                            </>
+                          ) : (
+                            'Log Token Generation'
+                          )}
                         </button>
                       </form>
                     )}
@@ -1351,26 +1464,9 @@
             );
           }
 
+          // DTO Dashboard
           const stats = generateStats();
           const filteredFaults = filterByDateRange(faults, 'created_at');
-          const filteredTokens = filterByDateRange(tokens, 'timestamp');
-          const advancedMetrics = calculateAdvancedMetrics();
-
-          const getPeriodLabel = () => {
-            const labels = {
-              'all': 'All Time',
-              'today': 'Today',
-              'yesterday': 'Yesterday',
-              'this-week': 'This Week',
-              'last-week': 'Last Week',
-              'this-month': 'This Month',
-              'last-month': 'Last Month',
-              'this-quarter': 'This Quarter',
-              'this-year': 'This Year',
-              'custom': 'Custom Period'
-            };
-            return labels[periodType] || 'All Time';
-          };
 
           return (
             <div className="min-h-screen bg-gray-50 p-4">
@@ -1383,263 +1479,16 @@
                     </div>
                     <div className="flex gap-2">
                       <button
-                        onClick={() => setShowConfig(true)}
-                        className="text-gray-400 hover:text-gray-600"
-                        title="Reconfigure Supabase"
-                      >
-                        <Settings />
-                      </button>
-                      <button
                         onClick={() => setUserRole('')}
                         className="text-sm text-blue-600 hover:underline"
                       >
                         Logout
                       </button>
-                      <button
-                        onClick={exportToCSV}
-                        className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 text-sm font-semibold"
-                      >
-                        Export CSV
-                      </button>
                     </div>
                   </div>
-
-                  <div className="bg-gradient-to-r from-purple-50 to-blue-50 rounded-lg p-4 mb-6">
-                    <button
-                      onClick={() => setShowAdvancedAnalytics(!showAdvancedAnalytics)}
-                      className="w-full flex items-center justify-between text-left"
-                    >
-                      <div className="flex items-center gap-2">
-                        <TrendingUp />
-                        <span className="font-bold text-gray-800">Advanced Statistical Analytics</span>
-                      </div>
-                      <span className="text-2xl">{showAdvancedAnalytics ? '▼' : '▶'}</span>
-                    </button>
-                  </div>
-
-                  {showAdvancedAnalytics && (
-                    <div className="space-y-6 mb-6">
-                      {/* 1. TREND ANALYSIS */}
-                      <div className="bg-white rounded-lg shadow p-6">
-                        <h3 className="text-lg font-bold text-gray-800 mb-4">Trend Analysis</h3>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                          <div className="bg-blue-50 p-4 rounded-lg">
-                            <p className="text-sm text-gray-600 mb-1">Day-over-Day Growth</p>
-                            <p className={`text-3xl font-bold ${parseFloat(advancedMetrics.trend.dayOverDayGrowth) > 0 ? 'text-red-600' : 'text-green-600'}`}>
-                              {advancedMetrics.trend.dayOverDayGrowth}%
-                            </p>
-                          </div>
-                          <div className="bg-gray-50 p-4 rounded-lg">
-                            <p className="text-sm text-gray-600 mb-2">Faults by Day (Last 7 Days)</p>
-                            <div className="space-y-1">
-                              {Object.entries(advancedMetrics.trend.faultsByDay).slice(-7).map(([day, count]) => (
-                                <div key={day} className="flex justify-between text-sm">
-                                  <span>{day}</span>
-                                  <span className="font-semibold">{count}</span>
-                                </div>
-                              ))}
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-
-                      {/* 2. PERFORMANCE METRICS */}
-                      <div className="bg-white rounded-lg shadow p-6">
-                        <h3 className="text-lg font-bold text-gray-800 mb-4"> Performance Metrics</h3>
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-                          <div className="bg-green-50 p-4 rounded-lg">
-                            <p className="text-sm text-gray-600 mb-1">First-Time Fix Rate</p>
-                            <p className="text-3xl font-bold text-green-600">{advancedMetrics.performance.firstTimeFixRate}%</p>
-                          </div>
-                          <div className="bg-yellow-50 p-4 rounded-lg">
-                            <p className="text-sm text-gray-600 mb-1">Repeat Fault Rate</p>
-                            <p className="text-3xl font-bold text-yellow-600">{advancedMetrics.performance.repeatFaultRate}%</p>
-                          </div>
-                          <div className="bg-purple-50 p-4 rounded-lg">
-                            <p className="text-sm text-gray-600 mb-1">Peak Fault Hour</p>
-                            <p className="text-xl font-bold text-purple-600">{advancedMetrics.performance.peakHour}</p>
-                          </div>
-                        </div>
-                        <div className="bg-gray-50 p-4 rounded-lg">
-                          <p className="text-sm font-semibold text-gray-700 mb-3">Response Time Distribution</p>
-                          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-sm">
-                            <div>
-                              <span className="text-gray-600">Min:</span>
-                              <span className="ml-2 font-semibold">{advancedMetrics.performance.responseStats.min}m</span>
-                            </div>
-                            <div>
-                              <span className="text-gray-600">Median:</span>
-                              <span className="ml-2 font-semibold">{advancedMetrics.performance.responseStats.median}m</span>
-                            </div>
-                            <div>
-                              <span className="text-gray-600">95th %ile:</span>
-                              <span className="ml-2 font-semibold">{advancedMetrics.performance.responseStats.p95}m</span>
-                            </div>
-                            <div>
-                              <span className="text-gray-600">Max:</span>
-                              <span className="ml-2 font-semibold">{advancedMetrics.performance.responseStats.max}m</span>
-                            </div>
-                          </div>
-                        </div>
-                        <div className="bg-gray-50 p-4 rounded-lg mt-4">
-                          <p className="text-sm font-semibold text-gray-700 mb-3">Avg Resolution Time by Fault Type</p>
-                          <div className="space-y-2">
-                            {Object.entries(advancedMetrics.performance.resolutionByType).map(([type, time]) => (
-                              <div key={type} className="flex justify-between items-center">
-                                <span className="text-sm text-gray-600">{type}</span>
-                                <span className="font-semibold text-blue-600">{time}m</span>
-                              </div>
-                            ))}
-                          </div>
-                        </div>
-                      </div>
-
-                      {/* 3. EFFICIENCY METRICS */}
-                      <div className="bg-white rounded-lg shadow p-6">
-                        <h3 className="text-lg font-bold text-gray-800 mb-4">Efficiency Metrics</h3>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                          <div className="bg-indigo-50 p-4 rounded-lg">
-                            <p className="text-sm text-gray-600 mb-1">Avg Travel Time</p>
-                            <p className="text-3xl font-bold text-indigo-600">{advancedMetrics.efficiency.avgTravelTime}m</p>
-                          </div>
-                          <div className="bg-orange-50 p-4 rounded-lg">
-                            <p className="text-sm text-gray-600 mb-1">Token-to-Fault Ratio</p>
-                            <p className="text-3xl font-bold text-orange-600">{advancedMetrics.efficiency.tokenToFaultRatio}%</p>
-                          </div>
-                        </div>
-                        <div className="bg-gray-50 p-4 rounded-lg">
-                          <p className="text-sm font-semibold text-gray-700 mb-3">Team Efficiency Breakdown</p>
-                          <div className="space-y-3">
-                            {Object.entries(advancedMetrics.efficiency.teamEfficiency).map(([member, data]) => (
-                              <div key={member} className="border-b pb-2">
-                                <p className="font-semibold text-gray-800 mb-1">{member}</p>
-                                <div className="grid grid-cols-3 gap-2 text-sm">
-                                  <div>
-                                    <span className="text-gray-600">Per Day:</span>
-                                    <span className="ml-1 font-semibold">{data.faultsPerDay}</span>
-                                  </div>
-                                  <div>
-                                    <span className="text-gray-600">Per Hour:</span>
-                                    <span className="ml-1 font-semibold">{data.faultsPerHour}</span>
-                                  </div>
-                                  <div>
-                                    <span className="text-gray-600">Work Hrs:</span>
-                                    <span className="ml-1 font-semibold">{data.totalWorkingHours}</span>
-                                  </div>
-                                </div>
-                              </div>
-                            ))}
-                          </div>
-                        </div>
-                      </div>
-
-                      {/* 4. PREDICTIVE INDICATORS */}
-                      <div className="bg-white rounded-lg shadow p-6">
-                        <h3 className="text-lg font-bold text-gray-800 mb-4"> Predictive Indicators</h3>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                          <div className="bg-red-50 p-4 rounded-lg">
-                            <p className="text-sm font-semibold text-gray-700 mb-3">High-Risk Meters (3+ Faults)</p>
-                            <div className="space-y-2 max-h-64 overflow-y-auto">
-                              {advancedMetrics.predictive.highRiskMeters.map(([meter, count]) => (
-                                <div key={meter} className="flex justify-between items-center bg-white p-2 rounded">
-                                  <span className="font-mono text-sm">{meter}</span>
-                                  <span className="bg-red-200 text-red-700 px-2 py-1 rounded text-xs font-bold">{count} faults</span>
-                                </div>
-                              ))}
-                            </div>
-                          </div>
-                          <div className="bg-yellow-50 p-4 rounded-lg">
-                            <p className="text-sm font-semibold text-gray-700 mb-3">High-Risk Locations</p>
-                            <div className="space-y-2 max-h-64 overflow-y-auto">
-                              {Object.entries(advancedMetrics.predictive.locationRisk)
-                                .filter(([loc, data]) => data.count > 0)
-                                .sort((a, b) => b[1].count - a[1].count)
-                                .slice(0, 10)
-                                .map(([location, data]) => (
-                                  <div key={location} className="flex justify-between items-center bg-white p-2 rounded text-sm">
-                                    <span>{location}</span>
-                                    <div className="flex gap-2">
-                                      <span className="text-gray-600">{data.count} faults</span>
-                                      <span className="text-orange-600 font-semibold">{data.avgResolution.toFixed(0)}m avg</span>
-                                    </div>
-                                  </div>
-                                ))}
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-
-                      {/* 5. COMPARATIVE ANALYTICS */}
-                      <div className="bg-white rounded-lg shadow p-6">
-                        <h3 className="text-lg font-bold text-gray-800 mb-4">Comparative Analytics</h3>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                          <div className="bg-gray-50 p-4 rounded-lg">
-                            <p className="text-sm font-semibold text-gray-700 mb-3">Faults by Day of Week</p>
-                            <div className="space-y-2">
-                              {Object.entries(advancedMetrics.comparative.dayOfWeekStats)
-                                .sort((a, b) => b[1] - a[1])
-                                .map(([day, count]) => (
-                                  <div key={day} className="flex justify-between items-center">
-                                    <span className="text-sm">{day}</span>
-                                    <div className="flex items-center gap-2">
-                                      <div className="w-24 bg-gray-200 rounded-full h-2">
-                                        <div
-                                          className="bg-blue-600 h-2 rounded-full"
-                                          style={{ width: `${(count / Math.max(...Object.values(advancedMetrics.comparative.dayOfWeekStats))) * 100}%` }}
-                                        ></div>
-                                      </div>
-                                      <span className="font-semibold text-sm w-8 text-right">{count}</span>
-                                    </div>
-                                  </div>
-                                ))}
-                            </div>
-                          </div>
-                          <div className="space-y-4">
-                            <div className="bg-green-50 p-4 rounded-lg">
-                              <p className="text-sm text-gray-600 mb-1">Best Performing Day</p>
-                              <p className="text-2xl font-bold text-green-600">{advancedMetrics.comparative.bestDay[0]}</p>
-                              <p className="text-sm text-gray-600">Least faults: {advancedMetrics.comparative.bestDay[1]}</p>
-                            </div>
-                            <div className="bg-red-50 p-4 rounded-lg">
-                              <p className="text-sm text-gray-600 mb-1">Busiest Day</p>
-                              <p className="text-2xl font-bold text-red-600">{advancedMetrics.comparative.worstDay[0]}</p>
-                              <p className="text-sm text-gray-600">Most faults: {advancedMetrics.comparative.worstDay[1]}</p>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-
-                      {/* 6. QUALITY METRICS */}
-                      <div className="bg-white rounded-lg shadow p-6">
-                        <h3 className="text-lg font-bold text-gray-800 mb-4"> Quality Metrics</h3>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                          <div className="bg-purple-50 p-4 rounded-lg">
-                            <p className="text-sm font-semibold text-gray-700 mb-3">Customer Satisfaction Proxy<br/>(Lights Restored Rate by Member)</p>
-                            <div className="space-y-2">
-                              {Object.entries(advancedMetrics.quality.customerSatisfaction)
-                                .sort((a, b) => b[1] - a[1])
-                                .map(([member, rate]) => (
-                                  <div key={member} className="flex justify-between items-center">
-                                    <span className="text-sm font-semibold">{member}</span>
-                                    <span className={`font-bold ${parseFloat(rate) >= 80 ? 'text-green-600' : parseFloat(rate) >= 50 ? 'text-yellow-600' : 'text-red-600'}`}>
-                                      {rate}%
-                                    </span>
-                                  </div>
-                                ))}
-                            </div>
-                          </div>
-                          <div className="bg-orange-50 p-4 rounded-lg">
-                            <p className="text-sm text-gray-600 mb-1">Fault Recurrence Rate</p>
-                            <p className="text-4xl font-bold text-orange-600">{advancedMetrics.quality.faultRecurrenceRate}%</p>
-                            <p className="text-sm text-gray-600 mt-2">Meters with 3+ faults</p>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  )}
 
                   <div className="bg-blue-50 rounded-lg p-4 mb-6">
-                    <h3 className="text-sm font-semibold text-blue-800 mb-3"> Report Period Filter</h3>
+                    <h3 className="text-sm font-semibold text-blue-800 mb-3">📅 Report Period Filter</h3>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div>
                         <label className="block text-sm font-medium text-gray-700 mb-2">Select Period Type</label>
@@ -1680,14 +1529,6 @@
                               onChange={(e) => setEndDate(e.target.value)}
                               className="w-full border border-gray-300 rounded-lg p-3 text-sm"
                             />
-                          </div>
-                        </div>
-                      )}
-                      
-                      {periodType !== 'custom' && periodType !== 'all' && (
-                        <div className="flex items-center bg-white rounded-lg p-3">
-                          <div className="text-sm text-gray-600">
-                            <strong>Showing:</strong> {getPeriodLabel()}
                           </div>
                         </div>
                       )}
@@ -1793,202 +1634,6 @@
 
                   <div className="bg-gray-50 rounded-lg p-6 mb-6">
                     <h2 className="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
-                      <TrendingUp />
-                      Token Generation Activity
-                    </h2>
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-                      <div className="bg-white rounded-lg p-4">
-                        <p className="text-gray-600 mb-2">Total Tokens</p>
-                        <p className="text-3xl font-bold text-blue-600">
-                          {stats.totalTokens}
-                        </p>
-                      </div>
-                      <div className="bg-white rounded-lg p-4">
-                        <p className="text-gray-600 mb-2">Total Faults</p>
-                        <p className="text-3xl font-bold text-green-600">
-                          {stats.total}
-                        </p>
-                      </div>
-                      <div className="bg-white rounded-lg p-4">
-                        <p className="text-gray-600 mb-2">Resolved</p>
-                        <p className="text-3xl font-bold text-purple-600">
-                          {stats.resolved}
-                        </p>
-                      </div>
-                    </div>
-
-                    {filteredTokens.length > 0 && (
-                      <div>
-                        <h3 className="font-semibold text-gray-800 mb-3">Meters Requiring Frequent Tokens</h3>
-                        <div className="bg-white rounded-lg p-4">
-                          {Object.entries(
-                            filteredTokens.reduce((acc, token) => {
-                              acc[token.meter_number] = (acc[token.meter_number] || 0) + 1;
-                              return acc;
-                            }, {})
-                          )
-                            .sort((a, b) => b[1] - a[1])
-                            .slice(0, 5)
-                            .map(([meter, count]) => (
-                              <div key={meter} className="flex justify-between py-2 border-b last:border-b-0">
-                                <span className="text-gray-700 font-mono">{meter}</span>
-                                <span className="bg-yellow-100 text-yellow-700 px-3 py-1 rounded-full text-sm font-semibold">
-                                  {count} tokens
-                                </span>
-                              </div>
-                            ))}
-                        </div>
-                      </div>
-                    )}
-                  </div>
-
-                  <div className="bg-gray-50 rounded-lg p-6 mb-6">
-                    <h2 className="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
-                      <Phone />
-                      Fault Source Performance
-                    </h2>
-                    <div className="space-y-3">
-                      {Object.entries(stats.channelStats).map(([source, count]) => (
-                        <div key={source}>
-                          <div className="flex justify-between mb-1">
-                            <span className="text-gray-700">{source}</span>
-                            <span className="font-semibold">{count} faults</span>
-                          </div>
-                          <div className="w-full bg-gray-200 rounded-full h-2">
-                            <div
-                              className="bg-blue-600 h-2 rounded-full"
-                              style={{ width: `${stats.total > 0 ? (count / stats.total) * 100 : 0}%` }}
-                            ></div>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-
-                  <div className="bg-gray-50 rounded-lg p-6 mb-6">
-                    <h2 className="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
-                      <MapPin />
-                      Location Hotspots
-                    </h2>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                      {Object.entries(stats.locationStats)
-                        .sort((a, b) => b[1] - a[1])
-                        .slice(0, 6)
-                        .map(([location, count]) => (
-                          <div key={location} className="bg-white rounded-lg p-3 flex justify-between items-center">
-                            <span className="text-gray-700">{location}</span>
-                            <span className="bg-red-100 text-red-700 px-3 py-1 rounded-full font-semibold">
-                              {count}
-                            </span>
-                          </div>
-                        ))}
-                    </div>
-                  </div>
-
-                  <div className="bg-gray-50 rounded-lg p-6 mb-6">
-                    <h2 className="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
-                      <Users />
-                      Individual Team Member Performance
-                    </h2>
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                      {Object.entries(stats.teamStats).map(([member, data]) => {
-                        const memberTokens = filteredTokens.filter(t => t.team_member === member);
-                        const avgResponseTimes = filteredFaults
-                          .filter(f => f.team_member === member)
-                          .map(getResponseTime)
-                          .filter(t => t !== null);
-                        const avgResponse = avgResponseTimes.length > 0
-                          ? Math.round(avgResponseTimes.reduce((a, b) => a + b, 0) / avgResponseTimes.length)
-                          : 0;
-                        
-                        return (
-                          <div key={member} className="bg-white rounded-lg p-5 shadow-sm border border-gray-200">
-                            <div className="flex items-center justify-between mb-4">
-                              <h3 className="font-bold text-xl text-gray-800">{member}</h3>
-                              <div className={`w-12 h-12 rounded-full flex items-center justify-center ${
-                                data.resolved > 0 && (data.lightsRestored / data.resolved) >= 0.8
-                                  ? 'bg-green-100'
-                                  : data.resolved > 0 && (data.lightsRestored / data.resolved) >= 0.5
-                                  ? 'bg-yellow-100'
-                                  : 'bg-red-100'
-                              }`}>
-                                <span className="text-2xl">
-                                  {data.resolved > 0 && (data.lightsRestored / data.resolved) >= 0.8 ? '🌟' : 
-                                   data.resolved > 0 && (data.lightsRestored / data.resolved) >= 0.5 ? '⚡' : '🔧'}
-                                </span>
-                              </div>
-                            </div>
-                            
-                            <div className="space-y-3">
-                              <div className="flex justify-between items-center py-2 border-b">
-                                <span className="text-gray-600 text-sm">Total Faults</span>
-                                <span className="font-bold text-lg text-blue-600">{data.total}</span>
-                              </div>
-                              
-                              <div className="flex justify-between items-center py-2 border-b">
-                                <span className="text-gray-600 text-sm">Resolved</span>
-                                <span className="font-bold text-lg text-green-600">{data.resolved}</span>
-                              </div>
-                              
-                              <div className="flex justify-between items-center py-2 border-b">
-                                <span className="text-gray-600 text-sm">In Progress</span>
-                                <span className="font-bold text-lg text-yellow-600">
-                                  {data.total - data.resolved}
-                                </span>
-                              </div>
-                              
-                              <div className="flex justify-between items-center py-2 border-b">
-                                <span className="text-gray-600 text-sm">Lights Restored</span>
-                                <span className="font-bold text-lg text-purple-600">{data.lightsRestored}</span>
-                              </div>
-                              
-                              <div className="flex justify-between items-center py-2 border-b">
-                                <span className="text-gray-600 text-sm">Tokens Generated</span>
-                                <span className="font-bold text-lg text-orange-600">{memberTokens.length}</span>
-                              </div>
-                              
-                              <div className="flex justify-between items-center py-2 border-b">
-                                <span className="text-gray-600 text-sm">Avg Response Time</span>
-                                <span className="font-bold text-lg text-indigo-600">{avgResponse}m</span>
-                              </div>
-                              
-                              <div className="mt-4 pt-4 border-t-2">
-                                <div className="text-center">
-                                  <p className="text-xs text-gray-500 mb-1">SUCCESS RATE</p>
-                                  <p className={`text-3xl font-bold ${
-                                    data.resolved > 0 && (data.lightsRestored / data.resolved) >= 0.8
-                                      ? 'text-green-600'
-                                      : data.resolved > 0 && (data.lightsRestored / data.resolved) >= 0.5
-                                      ? 'text-yellow-600'
-                                      : 'text-red-600'
-                                  }`}>
-                                    {data.resolved > 0 ? Math.round((data.lightsRestored / data.resolved) * 100) : 0}%
-                                  </p>
-                                  <div className="w-full bg-gray-200 rounded-full h-2 mt-2">
-                                    <div
-                                      className={`h-2 rounded-full ${
-                                        data.resolved > 0 && (data.lightsRestored / data.resolved) >= 0.8
-                                          ? 'bg-green-600'
-                                          : data.resolved > 0 && (data.lightsRestored / data.resolved) >= 0.5
-                                          ? 'bg-yellow-600'
-                                          : 'bg-red-600'
-                                      }`}
-                                      style={{ 
-                                        width: `${data.resolved > 0 ? (data.lightsRestored / data.resolved) * 100 : 0}%` 
-                                      }}
-                                    ></div>
-                                  </div>
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                        );
-                      })}
-                    </div>
-                  </div>
-
-                  <div className="bg-gray-50 rounded-lg p-6 mb-6">
-                    <h2 className="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
                       <Calendar />
                       Recent Fault Activity with Photos
                     </h2>
@@ -2014,13 +1659,18 @@
                                         {fault.priority}
                                       </span>
                                     )}
+                                    {fault.edited && (
+                                      <span className="px-2 py-1 rounded text-xs font-bold bg-orange-100 text-orange-700">
+                                        ✏️ EDITED
+                                      </span>
+                                    )}
                                   </div>
-                                  <p className="text-gray-600 text-sm"> {fault.location}</p>
+                                  <p className="text-gray-600 text-sm">📍 {fault.location}</p>
                                   {fault.customer_name && (
-                                    <p className="text-gray-600 text-sm"> {fault.customer_name}</p>
+                                    <p className="text-gray-600 text-sm">👤 {fault.customer_name}</p>
                                   )}
                                   {fault.customer_phone && (
-                                    <p className="text-gray-600 text-sm"> {fault.customer_phone}</p>
+                                    <p className="text-gray-600 text-sm">📞 {fault.customer_phone}</p>
                                   )}
                                 </div>
                                 <span
@@ -2032,9 +1682,19 @@
                                       : 'bg-gray-100 text-gray-700'
                                   }`}
                                 >
-                                  {fault.status === 'resolved' ? 'Resolved' : fault.status === 'in-progress' ? '⏳ In Progress' : '📋 Assigned'}
+                                  {fault.status === 'resolved' ? '✅ Resolved' : fault.status === 'in-progress' ? '⏳ In Progress' : '📋 Assigned'}
                                 </span>
                               </div>
+
+                              {fault.edited && (
+                                <div className="bg-orange-50 border border-orange-200 rounded-lg p-3 mb-3">
+                                  <p className="text-xs font-bold text-orange-800 mb-1">⚠️ EDIT LOG</p>
+                                  <p className="text-sm text-orange-700"><strong>Reason:</strong> {fault.edit_reason}</p>
+                                  <p className="text-xs text-orange-600 mt-1">
+                                    Edited at: {new Date(fault.edited_at).toLocaleString()}
+                                  </p>
+                                </div>
+                              )}
                               
                               <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-sm mb-3">
                                 <div>
@@ -2061,7 +1721,7 @@
 
                               {fault.comments && (
                                 <div className="bg-blue-50 rounded-lg p-3 mb-3">
-                                  <p className="text-xs font-semibold text-blue-800 mb-1"> Comments:</p>
+                                  <p className="text-xs font-semibold text-blue-800 mb-1">💬 Comments:</p>
                                   <p className="text-sm text-gray-700">{fault.comments}</p>
                                 </div>
                               )}
@@ -2082,7 +1742,7 @@
                                 {fault.status === 'resolved' && fault.lights_restored !== null && (
                                   <div className="flex items-center gap-1">
                                     <span className={fault.lights_restored ? 'text-green-600' : 'text-red-600'}>
-                                      {fault.lights_restored ? ' Lights: ON' : ' Lights: OFF'}
+                                      {fault.lights_restored ? '💡 Lights: ON' : '🔌 Lights: OFF'}
                                     </span>
                                   </div>
                                 )}
@@ -2090,7 +1750,7 @@
 
                               {(fault.photo_before_url || fault.photo_after_url) && (
                                 <div className="border-t pt-3 mt-3">
-                                  <p className="text-xs font-semibold text-gray-600 mb-2">PHOTO DOCUMENTATION</p>
+                                  <p className="text-xs font-semibold text-gray-600 mb-2">📷 PHOTO DOCUMENTATION</p>
                                   <div className="grid grid-cols-2 gap-3">
                                     {fault.photo_before_url && (
                                       <div>
