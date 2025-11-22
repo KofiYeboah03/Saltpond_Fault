@@ -28,6 +28,7 @@
         const MapPin = () => <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg>;
         const Users = () => <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" /></svg>;
         const TrendingUp = () => <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" /></svg>;
+        const Download = () => <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>;
 
         const LOCATIONS = [
           'Saltpond', 'Mankessim', 'Ekumfi', 'Biriwa', 'Egyaa No. 1', 
@@ -78,6 +79,7 @@
           const [authError, setAuthError] = useState('');
           const [selectedFault, setSelectedFault] = useState(null);
           const [workingFault, setWorkingFault] = useState(null);
+          const [showExportMenu, setShowExportMenu] = useState(false);
 
           const [newCall, setNewCall] = useState({
             location: '',
@@ -244,6 +246,158 @@
               alert('Error saving token: ' + error.message);
             }
             setSubmitting(false);
+          };
+
+          const exportToCSV = (data, filename) => {
+            if (data.length === 0) {
+              alert('No data to export');
+              return;
+            }
+
+            const headers = Object.keys(data[0]);
+            const csvContent = [
+              headers.join(','),
+              ...data.map(row => 
+                headers.map(header => {
+                  const value = row[header];
+                  if (value === null || value === undefined) return '';
+                  const stringValue = String(value).replace(/"/g, '""');
+                  return `"${stringValue}"`;
+                }).join(',')
+              )
+            ].join('\n');
+
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            const url = URL.createObjectURL(blob);
+            link.setAttribute('href', url);
+            link.setAttribute('download', filename);
+            link.style.visibility = 'hidden';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+          };
+
+          const handleExportAllFaults = () => {
+            const exportData = faults.map(fault => ({
+              'Meter Number': fault.meter_number,
+              'Location': fault.location,
+              'Customer Name': fault.customer_name,
+              'Customer Phone': fault.customer_phone,
+              'Priority': fault.priority,
+              'Fault Type': fault.fault_type,
+              'Status': fault.status,
+              'Team Member': fault.team_member,
+              'Reported Time': fault.reported_time ? new Date(fault.reported_time).toLocaleString() : '',
+              'Arrived Time': fault.arrived_time ? new Date(fault.arrived_time).toLocaleString() : '',
+              'Resolved Time': fault.resolved_time ? new Date(fault.resolved_time).toLocaleString() : '',
+              'Problem Statement': fault.problem_statement || '',
+              'Proposed Solution': fault.proposed_solution || '',
+              'Problem Solved': fault.problem_solved === true ? 'Yes' : fault.problem_solved === false ? 'No' : '',
+              'Lights Restored': fault.lights_restored === true ? 'Yes' : fault.lights_restored === false ? 'No' : '',
+              'Source': fault.source
+            }));
+            
+            const timestamp = new Date().toISOString().slice(0, 10);
+            exportToCSV(exportData, `ECG_All_Faults_${timestamp}.csv`);
+            setShowExportMenu(false);
+          };
+
+          const handleExportResolvedFaults = () => {
+            const resolvedFaults = faults.filter(f => f.status === 'resolved');
+            const exportData = resolvedFaults.map(fault => ({
+              'Meter Number': fault.meter_number,
+              'Location': fault.location,
+              'Customer Name': fault.customer_name,
+              'Customer Phone': fault.customer_phone,
+              'Priority': fault.priority,
+              'Fault Type': fault.fault_type,
+              'Team Member': fault.team_member,
+              'Reported Time': fault.reported_time ? new Date(fault.reported_time).toLocaleString() : '',
+              'Arrived Time': fault.arrived_time ? new Date(fault.arrived_time).toLocaleString() : '',
+              'Resolved Time': fault.resolved_time ? new Date(fault.resolved_time).toLocaleString() : '',
+              'Resolution Time (minutes)': getResolutionTime(fault) || '',
+              'Problem Statement': fault.problem_statement || '',
+              'Proposed Solution': fault.proposed_solution || '',
+              'Problem Solved': fault.problem_solved === true ? 'Yes' : fault.problem_solved === false ? 'No' : '',
+              'Lights Restored': fault.lights_restored === true ? 'Yes' : fault.lights_restored === false ? 'No' : ''
+            }));
+            
+            const timestamp = new Date().toISOString().slice(0, 10);
+            exportToCSV(exportData, `ECG_Resolved_Faults_${timestamp}.csv`);
+            setShowExportMenu(false);
+          };
+
+          const handleExportPendingFaults = () => {
+            const pendingFaults = faults.filter(f => f.status === 'pending');
+            const exportData = pendingFaults.map(fault => ({
+              'Meter Number': fault.meter_number,
+              'Location': fault.location,
+              'Customer Name': fault.customer_name,
+              'Customer Phone': fault.customer_phone,
+              'Priority': fault.priority,
+              'Fault Type': fault.fault_type,
+              'Team Member': fault.team_member,
+              'Reported Time': fault.reported_time ? new Date(fault.reported_time).toLocaleString() : '',
+              'Source': fault.source
+            }));
+            
+            const timestamp = new Date().toISOString().slice(0, 10);
+            exportToCSV(exportData, `ECG_Pending_Faults_${timestamp}.csv`);
+            setShowExportMenu(false);
+          };
+
+          const handleExportTokens = () => {
+            const exportData = tokens.map(token => ({
+              'Meter Number': token.meter_number,
+              'Location': token.location,
+              'Team Member': token.team_member,
+              'Timestamp': token.timestamp ? new Date(token.timestamp).toLocaleString() : '',
+              'Reason': token.reason || ''
+            }));
+            
+            const timestamp = new Date().toISOString().slice(0, 10);
+            exportToCSV(exportData, `ECG_Tokens_${timestamp}.csv`);
+            setShowExportMenu(false);
+          };
+
+          const handleExportTeamPerformance = () => {
+            const teamStats = FAULT_TEAM_MEMBERS.map(member => {
+              const memberFaults = faults.filter(f => f.team_member === member);
+              const memberResolved = memberFaults.filter(f => f.status === 'resolved');
+              const lightsRestored = memberResolved.filter(f => f.lights_restored === true).length;
+              const successRate = memberResolved.length > 0 ? Math.round((lightsRestored / memberResolved.length) * 100) : 0;
+              
+              return {
+                'Team Member': member,
+                'Total Faults': memberFaults.length,
+                'Resolved': memberResolved.length,
+                'In Progress': memberFaults.filter(f => f.status === 'in-progress').length,
+                'Pending': memberFaults.filter(f => f.status === 'pending').length,
+                'Lights Restored': lightsRestored,
+                'Success Rate (%)': successRate,
+                'Tokens Generated': tokens.filter(t => t.team_member === member).length
+              };
+            });
+            
+            const timestamp = new Date().toISOString().slice(0, 10);
+            exportToCSV(teamStats, `ECG_Team_Performance_${timestamp}.csv`);
+            setShowExportMenu(false);
+          };
+
+          const handleExportLocationStats = () => {
+            const locationData = LOCATIONS.map(location => ({
+              'Location': location,
+              'Total Faults': faults.filter(f => f.location === location).length,
+              'Resolved': faults.filter(f => f.location === location && f.status === 'resolved').length,
+              'Pending': faults.filter(f => f.location === location && f.status === 'pending').length,
+              'In Progress': faults.filter(f => f.location === location && f.status === 'in-progress').length,
+              'Tokens Generated': tokens.filter(t => t.location === location).length
+            })).filter(loc => loc['Total Faults'] > 0);
+            
+            const timestamp = new Date().toISOString().slice(0, 10);
+            exportToCSV(locationData, `ECG_Location_Statistics_${timestamp}.csv`);
+            setShowExportMenu(false);
           };
 
           const handleCompleteWork = async (e) => {
@@ -1097,15 +1251,69 @@
                       <h1 className="text-3xl font-bold text-gray-800">District Technical Officer</h1>
                       <p className="text-gray-600">System Dashboard</p>
                     </div>
-                    <button
-                      onClick={() => {
-                        setUserRole('');
-                        setUserName('');
-                      }}
-                      className="text-sm text-blue-600 hover:underline"
-                    >
-                      Logout
-                    </button>
+                    <div className="flex gap-3 items-center">
+                      <div className="relative">
+                        <button
+                          onClick={() => setShowExportMenu(!showExportMenu)}
+                          className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition font-semibold flex items-center gap-2"
+                        >
+                          <Download />
+                          Export Data
+                        </button>
+                        
+                        {showExportMenu && (
+                          <div className="absolute right-0 mt-2 w-64 bg-white rounded-lg shadow-xl border border-gray-200 z-50">
+                            <div className="p-2">
+                              <button
+                                onClick={handleExportAllFaults}
+                                className="w-full text-left px-4 py-2 hover:bg-gray-100 rounded text-sm"
+                              >
+                                📋 All Faults
+                              </button>
+                              <button
+                                onClick={handleExportResolvedFaults}
+                                className="w-full text-left px-4 py-2 hover:bg-gray-100 rounded text-sm"
+                              >
+                                ✅ Resolved Faults
+                              </button>
+                              <button
+                                onClick={handleExportPendingFaults}
+                                className="w-full text-left px-4 py-2 hover:bg-gray-100 rounded text-sm"
+                              >
+                                ⏳ Pending Faults
+                              </button>
+                              <button
+                                onClick={handleExportTokens}
+                                className="w-full text-left px-4 py-2 hover:bg-gray-100 rounded text-sm"
+                              >
+                                🎫 Token Generations
+                              </button>
+                              <button
+                                onClick={handleExportTeamPerformance}
+                                className="w-full text-left px-4 py-2 hover:bg-gray-100 rounded text-sm"
+                              >
+                                👥 Team Performance
+                              </button>
+                              <button
+                                onClick={handleExportLocationStats}
+                                className="w-full text-left px-4 py-2 hover:bg-gray-100 rounded text-sm"
+                              >
+                                📍 Location Statistics
+                              </button>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                      <button
+                        onClick={() => {
+                          setUserRole('');
+                          setUserName('');
+                        }}
+                        className="text-sm text-blue-600 hover:underline"
+                      >
+                        Logout
+                      </button>
+                    </div>
                   </div>
 
                   <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
