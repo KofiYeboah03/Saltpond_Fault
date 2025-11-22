@@ -291,7 +291,7 @@
               'Reported Time': fault.reported_time ? new Date(fault.reported_time).toLocaleString() : '',
               'Arrived Time': fault.arrived_time ? new Date(fault.arrived_time).toLocaleString() : '',
               'Resolved Time': fault.resolved_time ? new Date(fault.resolved_time).toLocaleString() : '',
-              'Problem Statement': fault.problem_statement || '',
+              'State Problem': fault.problem_statement || '',
               'Proposed Solution': fault.proposed_solution || '',
               'Problem Solved': fault.problem_solved === true ? 'Yes' : fault.problem_solved === false ? 'No' : '',
               'Lights Restored': fault.lights_restored === true ? 'Yes' : fault.lights_restored === false ? 'No' : '',
@@ -317,7 +317,7 @@
               'Arrived Time': fault.arrived_time ? new Date(fault.arrived_time).toLocaleString() : '',
               'Resolved Time': fault.resolved_time ? new Date(fault.resolved_time).toLocaleString() : '',
               'Resolution Time (minutes)': getResolutionTime(fault) || '',
-              'Problem Statement': fault.problem_statement || '',
+              'State Problem': fault.problem_statement || '',
               'Proposed Solution': fault.proposed_solution || '',
               'Problem Solved': fault.problem_solved === true ? 'Yes' : fault.problem_solved === false ? 'No' : '',
               'Lights Restored': fault.lights_restored === true ? 'Yes' : fault.lights_restored === false ? 'No' : ''
