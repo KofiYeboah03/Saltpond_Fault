@@ -94,11 +94,17 @@
           }, []);
 
           const handleAuthCodeSubmit = () => {
-            const upperCode = authCode.toUpperCase();
+            const upperCode = authCode.toUpperCase().trim();
+            console.log('Trying code:', upperCode);
+            console.log('Available codes:', AUTH_CODES);
+            
             if (AUTH_CODES[upperCode]) {
               const role = AUTH_CODES[upperCode];
+              console.log('Role:', role);
+              
               if (role === 'officer') {
                 setUserRole('officer');
+                setUserName('DTO');
               } else if (CME_MEMBERS.includes(role)) {
                 setUserRole('cme');
                 setUserName(role);
@@ -109,7 +115,7 @@
               setAuthCode('');
               setAuthError('');
             } else {
-              setAuthError('Invalid access code. Please try again.');
+              setAuthError('Invalid access code. Please try again. Try: DTO1122, CME1111, OFORI4422');
             }
           };
 
@@ -225,7 +231,7 @@
             setSubmitting(false);
           };
 
-          if (!userRole || !userName) {
+          if (!userRole) {
             return (
               <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-4">
                 <div className="max-w-md mx-auto mt-20">
