@@ -503,19 +503,6 @@
                       <form onSubmit={handleCompleteWork} className="space-y-4">
                         <div>
                           <label className="block text-sm font-medium text-gray-700 mb-2">
-                            Time Departed *
-                          </label>
-                          <input
-                            type="datetime-local"
-                            required
-                            value={workingFault.departed_time}
-                            onChange={(e) => setWorkingFault({...workingFault, departed_time: e.target.value})}
-                            className="w-full border border-gray-300 rounded-lg p-3"
-                          />
-                        </div>
-
-                        <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-2">
                             Time Arrived *
                           </label>
                           <input
@@ -529,9 +516,10 @@
 
                         <div>
                           <label className="block text-sm font-medium text-gray-700 mb-2">
-                            Fault Type
+                            Fault Type *
                           </label>
                           <select
+                            required
                             value={workingFault.fault_type || ''}
                             onChange={(e) => setWorkingFault({...workingFault, fault_type: e.target.value})}
                             className="w-full border border-gray-300 rounded-lg p-3"
@@ -545,28 +533,60 @@
 
                         <div>
                           <label className="block text-sm font-medium text-gray-700 mb-2">
-                            Parts Used
+                            State the Problem/Fault *
                           </label>
-                          <input
-                            type="text"
-                            value={workingFault.parts_used || ''}
-                            onChange={(e) => setWorkingFault({...workingFault, parts_used: e.target.value})}
+                          <textarea
+                            required
+                            value={workingFault.problem_statement || ''}
+                            onChange={(e) => setWorkingFault({...workingFault, problem_statement: e.target.value})}
                             className="w-full border border-gray-300 rounded-lg p-3"
-                            placeholder="e.g., Meter, Wires, Fuse"
-                          />
+                            rows="3"
+                            placeholder="Describe the problem you found"
+                          ></textarea>
                         </div>
 
                         <div>
                           <label className="block text-sm font-medium text-gray-700 mb-2">
-                            Comments
+                            Proposed Solution to the Fault *
                           </label>
                           <textarea
-                            value={workingFault.comments || ''}
-                            onChange={(e) => setWorkingFault({...workingFault, comments: e.target.value})}
+                            required
+                            value={workingFault.proposed_solution || ''}
+                            onChange={(e) => setWorkingFault({...workingFault, proposed_solution: e.target.value})}
                             className="w-full border border-gray-300 rounded-lg p-3"
                             rows="3"
-                            placeholder="Add any comments about the work done"
+                            placeholder="What solution did you apply or recommend?"
                           ></textarea>
+                        </div>
+
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-2">
+                            Is the Problem Solved? *
+                          </label>
+                          <div className="flex gap-4">
+                            <button
+                              type="button"
+                              onClick={() => setWorkingFault({...workingFault, problem_solved: true})}
+                              className={`flex-1 py-3 rounded-lg transition ${
+                                workingFault.problem_solved === true
+                                  ? 'bg-green-600 text-white'
+                                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                              }`}
+                            >
+                              Yes - Solved
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => setWorkingFault({...workingFault, problem_solved: false})}
+                              className={`flex-1 py-3 rounded-lg transition ${
+                                workingFault.problem_solved === false
+                                  ? 'bg-red-600 text-white'
+                                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                              }`}
+                            >
+                              No - Not Solved
+                            </button>
+                          </div>
                         </div>
 
                         <div>
