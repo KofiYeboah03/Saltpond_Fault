@@ -206,7 +206,6 @@
             setSelectedFault(fault);
             setWorkingFault({
               ...fault,
-              departed_time: new Date().toISOString().slice(0, 16),
               status: 'in-progress'
             });
             setActiveView('work-fault');
@@ -255,13 +254,13 @@
               const { error } = await supabase
                 .from('faults')
                 .update({
-                  departed_time: workingFault.departed_time,
                   arrived_time: workingFault.arrived_time,
                   resolved_time: workingFault.resolved_time,
                   fault_type: workingFault.fault_type || selectedFault.fault_type,
+                  problem_statement: workingFault.problem_statement,
+                  proposed_solution: workingFault.proposed_solution,
+                  problem_solved: workingFault.problem_solved,
                   lights_restored: workingFault.lights_restored,
-                  parts_used: workingFault.parts_used,
-                  comments: workingFault.comments,
                   status: 'resolved',
                   team_member: userName
                 })
@@ -1164,37 +1163,87 @@
                   <div className="bg-gray-50 rounded-lg p-6 mb-6">
                     <h2 className="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
                       <Users />
-                      Team Performance
+                      Team Performance Rankings
                     </h2>
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                      {Object.entries(teamStats).map(([member, stats]) => (
-                        <div key={member} className="bg-white rounded-lg p-4 shadow-sm border border-gray-200">
-                          <h3 className="font-bold text-lg text-gray-800 mb-3">{member}</h3>
-                          <div className="space-y-2">
-                            <div className="flex justify-between">
-                              <span className="text-gray-600 text-sm">Total</span>
-                              <span className="font-bold">{stats.total}</span>
+                      {Object.entries(teamStats)
+                        .sort((a, b) => {
+                          const successRateA = a[1].resolved > 0 ? (a[1].lightsRestored / a[1].resolved) : 0;
+                          const successRateB = b[1].resolved > 0 ? (b[1].lightsRestored / b[1].resolved) : 0;
+                          if (successRateB !== successRateA) return successRateB - successRateA;
+                          return b[1].resolved - a[1].resolved;
+                        })
+                        .map(([member, stats], index) => {
+                          const successRate = stats.resolved > 0 ? Math.round((stats.lightsRestored / stats.resolved) * 100) : 0;
+                          const isTopPerformer = index === 0;
+                          return (
+                            <div key={member} className={`bg-white rounded-lg p-4 shadow-sm border-2 ${
+                              isTopPerformer ? 'border-yellow-400 bg-yellow-50' : 'border-gray-200'
+                            } relative`}>
+                              {isTopPerformer && (
+                                <div className="absolute -top-3 -right-3 bg-yellow-400 text-yellow-900 rounded-full w-10 h-10 flex items-center justify-center font-bold text-xl shadow-lg">
+                                  🏆
+                                </div>
+                              )}
+                              {index === 1 && (
+                                <div className="absolute -top-3 -right-3 bg-gray-300 text-gray-700 rounded-full w-10 h-10 flex items-center justify-center font-bold text-xl shadow-lg">
+                                  🥈
+                                </div>
+                              )}
+                              {index === 2 && (
+                                <div className="absolute -top-3 -right-3 bg-orange-300 text-orange-800 rounded-full w-10 h-10 flex items-center justify-center font-bold text-xl shadow-lg">
+                                  🥉
+                                </div>
+                              )}
+                              <div className="flex items-center justify-between mb-3">
+                                <h3 className="font-bold text-lg text-gray-800">{member}</h3>
+                                <span className="text-sm font-bold text-gray-500">#{index + 1}</span>
+                              </div>
+                              <div className="space-y-2">
+                                <div className="flex justify-between">
+                                  <span className="text-gray-600 text-sm">Total</span>
+                                  <span className="font-bold">{stats.total}</span>
+                                </div>
+                                <div className="flex justify-between">
+                                  <span className="text-gray-600 text-sm">Resolved</span>
+                                  <span className="font-bold text-green-600">{stats.resolved}</span>
+                                </div>
+                                <div className="flex justify-between">
+                                  <span className="text-gray-600 text-sm">In Progress</span>
+                                  <span className="font-bold text-yellow-600">{stats.inProgress}</span>
+                                </div>
+                                <div className="flex justify-between">
+                                  <span className="text-gray-600 text-sm">Lights Restored</span>
+                                  <span className="font-bold text-purple-600">{stats.lightsRestored}</span>
+                                </div>
+                                <div className="pt-2 border-t mt-2">
+                                  <div className="mb-1">
+                                    <div className="flex justify-between items-center mb-1">
+                                      <span className="text-xs text-gray-500">Success Rate</span>
+                                      <span className={`text-sm font-bold ${
+                                        successRate >= 80 ? 'text-green-600' :
+                                        successRate >= 60 ? 'text-yellow-600' :
+                                        'text-red-600'
+                                      }`}>
+                                        {successRate}%
+                                      </span>
+                                    </div>
+                                    <div className="w-full bg-gray-200 rounded-full h-2">
+                                      <div 
+                                        className={`h-2 rounded-full ${
+                                          successRate >= 80 ? 'bg-green-600' :
+                                          successRate >= 60 ? 'bg-yellow-600' :
+                                          'bg-red-600'
+                                        }`}
+                                        style={{width: `${successRate}%`}}
+                                      ></div>
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
                             </div>
-                            <div className="flex justify-between">
-                              <span className="text-gray-600 text-sm">Resolved</span>
-                              <span className="font-bold text-green-600">{stats.resolved}</span>
-                            </div>
-                            <div className="flex justify-between">
-                              <span className="text-gray-600 text-sm">In Progress</span>
-                              <span className="font-bold text-yellow-600">{stats.inProgress}</span>
-                            </div>
-                            <div className="flex justify-between">
-                              <span className="text-gray-600 text-sm">Lights Restored</span>
-                              <span className="font-bold text-purple-600">{stats.lightsRestored}</span>
-                            </div>
-                            <div className="pt-2 border-t mt-2">
-                              <p className="text-xs text-gray-500 text-center">
-                                Success Rate: {stats.resolved > 0 ? Math.round((stats.lightsRestored / stats.resolved) * 100) : 0}%
-                              </p>
-                            </div>
-                          </div>
-                        </div>
-                      ))}
+                          );
+                        })}
                     </div>
                   </div>
 
