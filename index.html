@@ -1654,48 +1654,47 @@
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-                      <h2 className="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
-                        <TrendingUp />
-                        Key Metrics
-                      </h2>
-                      <div className="space-y-3">
-                        <div className="bg-white p-3 rounded">
-                          <p className="text-sm text-gray-600 mb-1">Average Resolution Time</p>
-                          <p className="text-2xl font-bold text-blue-600">
-                            {resolvedFaults.length > 0
-                              ? Math.round(
-                                  resolvedFaults
-                                    .map(getResolutionTime)
-                                    .filter(t => t !== null)
-                                    .reduce((a, b) => a + b, 0) / resolvedFaults.length
-                                )
-                              : 0}
-                            m
-                          </p>
-                        </div>
-                        <div className="bg-white p-3 rounded">
-                          <p className="text-sm text-gray-600 mb-1">Overall Success Rate</p>
-                          <p className="text-2xl font-bold text-green-600">
-                            {resolvedFaults.length > 0
-                              ? Math.round(
-                                  (resolvedFaults.filter(f => f.lights_restored === true).length /
-                                    resolvedFaults.length) *
-                                    100
-                                )
-                              : 0}
-                            %
-                          </p>
-                        </div>
-                        <div className="bg-white p-3 rounded">
-                          <p className="text-sm text-gray-600 mb-1">Token to Fault Ratio</p>
-                          <p className="text-2xl font-bold text-purple-600">
-                            {faults.length > 0
-                              ? ((tokens.length / faults.length) * 100).toFixed(1)
-                              : 0}
-                            %
-                          </p>
-                        </div>
+                 <div className="bg-gray-50 rounded-lg p-6 mb-6">
+                    <h2 className="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
+                      <TrendingUp />
+                      Key Metrics
+                    </h2>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                      <div className="bg-white p-4 rounded-lg shadow-sm">
+                        <p className="text-sm text-gray-600 mb-1">Average Resolution Time</p>
+                        <p className="text-2xl font-bold text-blue-600">
+                          {resolvedFaults.length > 0
+                            ? Math.round(
+                                resolvedFaults
+                                  .map(getResolutionTime)
+                                  .filter(t => t !== null)
+                                  .reduce((a, b) => a + b, 0) / resolvedFaults.length
+                              )
+                            : 0}
+                          m
+                        </p>
+                      </div>
+                      <div className="bg-white p-4 rounded-lg shadow-sm">
+                        <p className="text-sm text-gray-600 mb-1">Overall Success Rate</p>
+                        <p className="text-2xl font-bold text-green-600">
+                          {resolvedFaults.length > 0
+                            ? Math.round(
+                                (resolvedFaults.filter(f => f.lights_restored === true).length /
+                                  resolvedFaults.length) *
+                                  100
+                              )
+                            : 0}
+                          %
+                        </p>
+                      </div>
+                      <div className="bg-white p-4 rounded-lg shadow-sm">
+                        <p className="text-sm text-gray-600 mb-1">Token to Fault Ratio</p>
+                        <p className="text-2xl font-bold text-purple-600">
+                          {faults.length > 0
+                            ? ((tokens.length / faults.length) * 100).toFixed(1)
+                            : 0}
+                          %
+                        </p>
                       </div>
                     </div>
                   </div>
