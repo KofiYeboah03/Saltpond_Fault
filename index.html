@@ -70,6 +70,7 @@
           const [userRole, setUserRole] = useState('');
           const [userName, setUserName] = useState('');
           const [faults, setFaults] = useState([]);
+          const [tokens, setTokens] = useState([]);
           const [activeView, setActiveView] = useState('dashboard');
           const [loading, setLoading] = useState(false);
           const [submitting, setSubmitting] = useState(false);
@@ -137,6 +138,14 @@
 
               if (faultsError) throw faultsError;
               setFaults(faultsData || []);
+
+              const { data: tokensData, error: tokensError } = await supabase
+                .from('tokens')
+                .select('*')
+                .order('timestamp', { ascending: false });
+
+              if (tokensError) throw tokensError;
+              setTokens(tokensData || []);
             } catch (error) {
               console.error('Error loading data:', error);
               alert('Error loading data: ' + error.message);
