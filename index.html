@@ -1081,8 +1081,96 @@
                     </div>
                   </div>
 
+                  <div className="bg-gray-50 rounded-lg p-6 mb-6">
+                    <h2 className="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
+                      <Phone />
+                      Token Generation Analysis
+                    </h2>
+                    
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                      {FAULT_TEAM_MEMBERS.map(member => {
+                        const memberTokens = tokens.filter(t => t.team_member === member);
+                        return (
+                          <div key={member} className="bg-white rounded-lg p-4 shadow-sm border border-gray-200">
+                            <h3 className="font-bold text-gray-800 mb-3">{member}</h3>
+                            <div className="space-y-2">
+                              <div className="flex justify-between">
+                                <span className="text-gray-600 text-sm">Total Tokens</span>
+                                <span className="font-bold text-purple-600">{memberTokens.length}</span>
+                              </div>
+                              <div className="flex justify-between">
+                                <span className="text-gray-600 text-sm">Today</span>
+                                <span className="font-bold text-blue-600">
+                                  {memberTokens.filter(t => {
+                                    const tokenDate = new Date(t.timestamp);
+                                    const today = new Date();
+                                    return tokenDate.toDateString() === today.toDateString();
+                                  }).length}
+                                </span>
+                              </div>
+                              <div className="flex justify-between">
+                                <span className="text-gray-600 text-sm">This Week</span>
+                                <span className="font-bold text-green-600">
+                                  {memberTokens.filter(t => {
+                                    const tokenDate = new Date(t.timestamp);
+                                    const weekAgo = new Date();
+                                    weekAgo.setDate(weekAgo.getDate() - 7);
+                                    return tokenDate >= weekAgo;
+                                  }).length}
+                                </span>
+                              </div>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+
+                    <div className="bg-white rounded-lg p-4 mb-4">
+                      <h3 className="font-bold text-gray-800 mb-3">Token Generation by Location</h3>
+                      <div className="space-y-2">
+                        {LOCATIONS.map(location => {
+                          const locationTokens = tokens.filter(t => t.location === location);
+                          if (locationTokens.length === 0) return null;
+                          return (
+                            <div key={location} className="flex justify-between items-center bg-gray-50 p-2 rounded">
+                              <span className="text-gray-700 text-sm">{location}</span>
+                              <span className="bg-purple-100 text-purple-700 px-2 py-1 rounded font-bold text-sm">
+                                {locationTokens.length}
+                              </span>
+                            </div>
+                          );
+                        }).filter(Boolean)}
+                      </div>
+                    </div>
+
+                    <div className="bg-white rounded-lg p-4">
+                      <h3 className="font-bold text-gray-800 mb-3">Recent Token Generations</h3>
+                      <div className="space-y-2 max-h-96 overflow-y-auto">
+                        {tokens.slice(0, 15).map((token) => (
+                          <div key={token.id} className="bg-gray-50 rounded p-3 border border-gray-200">
+                            <div className="flex justify-between items-start mb-2">
+                              <div>
+                                <p className="font-semibold text-gray-800">{token.meter_number}</p>
+                                <p className="text-sm text-gray-600">{token.location}</p>
+                              </div>
+                              <div className="text-right">
+                                <p className="text-xs text-gray-500">{token.team_member}</p>
+                                <p className="text-xs text-gray-500">{new Date(token.timestamp).toLocaleString()}</p>
+                              </div>
+                            </div>
+                            {token.reason && (
+                              <p className="text-sm text-gray-600 bg-blue-50 p-2 rounded mt-2">
+                                <span className="font-semibold">Reason:</span> {token.reason}
+                              </p>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+
                   <div className="bg-gray-50 rounded-lg p-6">
-                    <h2 className="text-xl font-bold text-gray-800 mb-4">Recent Activity</h2>
+                    <h2 className="text-xl font-bold text-gray-800 mb-4">Recent Fault Activity</h2>
                     <div className="space-y-3">
                       {faults.slice(0, 10).map((fault) => (
                         <div key={fault.id} className="bg-white rounded-lg p-4 border border-gray-200">
