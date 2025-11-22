@@ -647,7 +647,7 @@
                           onClick={() => setActiveView('field-dashboard')}
                           className="text-sm text-blue-600 hover:underline"
                         >
-                          Back to Faults
+                          Back to Dashboard
                         </button>
                       </div>
 
@@ -744,6 +744,160 @@
               );
             }
 
+            if (activeView === 'log-call') {
+              return (
+                <div className="min-h-screen bg-gray-50 p-4">
+                  <div className="max-w-2xl mx-auto">
+                    <div className="bg-white rounded-lg shadow-lg p-6">
+                      <div className="flex justify-between items-center mb-6">
+                        <div>
+                          <h1 className="text-2xl font-bold text-gray-800">Log Call from Customer</h1>
+                          <p className="text-gray-600">Technician: {userName}</p>
+                        </div>
+                        <button
+                          onClick={() => setActiveView('field-dashboard')}
+                          className="text-sm text-blue-600 hover:underline"
+                        >
+                          Back to Dashboard
+                        </button>
+                      </div>
+
+                      <form onSubmit={handleSubmitCall} className="space-y-4">
+                        <div className="bg-orange-50 p-3 rounded-lg mb-4">
+                          <p className="text-sm font-semibold text-orange-800">Log Customer Fault Call</p>
+                        </div>
+
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-2">
+                            Location *
+                          </label>
+                          <select
+                            required
+                            value={newCall.location}
+                            onChange={(e) => setNewCall({...newCall, location: e.target.value})}
+                            className="w-full border border-gray-300 rounded-lg p-3"
+                          >
+                            <option value="">Select location</option>
+                            {LOCATIONS.map(location => (
+                              <option key={location} value={location}>{location}</option>
+                            ))}
+                          </select>
+                        </div>
+
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-2">
+                            Prepaid Meter Number *
+                          </label>
+                          <input
+                            type="text"
+                            required
+                            value={newCall.meterNumber}
+                            onChange={(e) => setNewCall({...newCall, meterNumber: e.target.value})}
+                            className="w-full border border-gray-300 rounded-lg p-3"
+                            placeholder="Enter meter number"
+                          />
+                        </div>
+
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-2">
+                            Customer Name *
+                          </label>
+                          <input
+                            type="text"
+                            required
+                            value={newCall.customerName}
+                            onChange={(e) => setNewCall({...newCall, customerName: e.target.value})}
+                            className="w-full border border-gray-300 rounded-lg p-3"
+                            placeholder="Enter customer name"
+                          />
+                        </div>
+
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-2">
+                            Customer Phone Number *
+                          </label>
+                          <input
+                            type="tel"
+                            required
+                            value={newCall.customerPhone}
+                            onChange={(e) => setNewCall({...newCall, customerPhone: e.target.value})}
+                            className="w-full border border-gray-300 rounded-lg p-3"
+                            placeholder="Enter phone number"
+                          />
+                        </div>
+
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-2">
+                            Fault Reason *
+                          </label>
+                          <input
+                            type="text"
+                            required
+                            value={newCall.faultReason}
+                            onChange={(e) => setNewCall({...newCall, faultReason: e.target.value})}
+                            className="w-full border border-gray-300 rounded-lg p-3"
+                            placeholder="Describe the fault reason"
+                          />
+                        </div>
+
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-2">
+                            Priority Level *
+                          </label>
+                          <select
+                            required
+                            value={newCall.priority}
+                            onChange={(e) => setNewCall({...newCall, priority: e.target.value})}
+                            className="w-full border border-gray-300 rounded-lg p-3"
+                          >
+                            {PRIORITY_LEVELS.map(level => (
+                              <option key={level} value={level}>{level}</option>
+                            ))}
+                          </select>
+                        </div>
+
+                        <button
+                          type="submit"
+                          disabled={submitting}
+                          className="w-full bg-orange-600 text-white py-4 rounded-lg hover:bg-orange-700 transition font-semibold disabled:bg-gray-400 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                        >
+                          {submitting ? (
+                            <>
+                              <Loader />
+                              Logging Call...
+                            </>
+                          ) : (
+                            'Log Customer Call'
+                          )}
+                        </button>
+                      </form>
+
+                      <div className="mt-6 pt-6 border-t">
+                        <h3 className="font-bold text-gray-800 mb-3">Recent Calls Logged ({faults.filter(f => f.team_member === userName && f.source === 'Call Line').length})</h3>
+                        <div className="space-y-2 max-h-64 overflow-y-auto">
+                          {faults
+                            .filter(f => f.team_member === userName && f.source === 'Call Line')
+                            .slice(0, 5)
+                            .map((fault) => (
+                              <div key={fault.id} className="bg-gray-50 rounded p-3 text-sm">
+                                <div className="flex justify-between items-start mb-1">
+                                  <span className="font-semibold">{fault.meter_number}</span>
+                                  <span className="text-xs text-gray-500">
+                                    {new Date(fault.reported_time).toLocaleString()}
+                                  </span>
+                                </div>
+                                <p className="text-gray-600">{fault.location} - {fault.customer_name}</p>
+                                <p className="text-gray-500 text-xs mt-1">{fault.fault_type}</p>
+                              </div>
+                            ))}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              );
+            }
+
             const pendingFaults = faults.filter(f => f.status === 'pending');
             const inProgressFaults = faults.filter(f => f.status === 'in-progress' && f.team_member === userName);
 
@@ -767,10 +921,10 @@
                       </button>
                     </div>
 
-                    <div className="flex gap-2 mb-6">
+                    <div className="grid grid-cols-3 gap-2 mb-6">
                       <button
                         onClick={() => setActiveView('field-dashboard')}
-                        className={`flex-1 py-3 rounded-lg transition ${
+                        className={`py-3 rounded-lg transition ${
                           activeView === 'field-dashboard' 
                             ? 'bg-blue-600 text-white' 
                             : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
@@ -779,8 +933,18 @@
                         My Faults
                       </button>
                       <button
+                        onClick={() => setActiveView('log-call')}
+                        className={`py-3 rounded-lg transition ${
+                          activeView === 'log-call' 
+                            ? 'bg-orange-600 text-white' 
+                            : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                        }`}
+                      >
+                        Log Call
+                      </button>
+                      <button
                         onClick={() => setActiveView('log-token')}
-                        className={`flex-1 py-3 rounded-lg transition ${
+                        className={`py-3 rounded-lg transition ${
                           activeView === 'log-token' 
                             ? 'bg-green-600 text-white' 
                             : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
