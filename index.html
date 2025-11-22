@@ -87,7 +87,12 @@
             priority: 'Medium'
           });
 
-          const [workingFault, setWorkingFault] = useState(null);
+          const [newToken, setNewToken] = useState({
+            meterNumber: '',
+            location: '',
+            reason: '',
+            teamMember: ''
+          });
 
           useEffect(() => {
             const client = createClient(SUPABASE_URL, SUPABASE_KEY);
@@ -204,6 +209,41 @@
               status: 'in-progress'
             });
             setActiveView('work-fault');
+          };
+
+          const handleSubmitToken = async (e) => {
+            e.preventDefault();
+            setSubmitting(true);
+            
+            try {
+              const tokenData = {
+                id: `token_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+                meter_number: newToken.meterNumber,
+                location: newToken.location,
+                reason: newToken.reason || null,
+                team_member: userName,
+                timestamp: new Date().toISOString()
+              };
+
+              const { error } = await supabase
+                .from('tokens')
+                .insert([tokenData]);
+
+              if (error) throw error;
+
+              setNewToken({
+                meterNumber: '',
+                location: '',
+                reason: '',
+                teamMember: ''
+              });
+              alert('Token generation logged successfully');
+              await loadData();
+            } catch (error) {
+              console.error('Error saving token:', error);
+              alert('Error saving token: ' + error.message);
+            }
+            setSubmitting(false);
           };
 
           const handleCompleteWork = async (e) => {
@@ -615,6 +655,29 @@
                       </button>
                     </div>
 
+                    <div className="flex gap-2 mb-6">
+                      <button
+                        onClick={() => setActiveView('field-dashboard')}
+                        className={`flex-1 py-3 rounded-lg transition ${
+                          activeView === 'field-dashboard' 
+                            ? 'bg-blue-600 text-white' 
+                            : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                        }`}
+                      >
+                        My Faults
+                      </button>
+                      <button
+                        onClick={() => setActiveView('log-token')}
+                        className={`flex-1 py-3 rounded-lg transition ${
+                          activeView === 'log-token' 
+                            ? 'bg-green-600 text-white' 
+                            : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                        }`}
+                      >
+                        Log Token
+                      </button>
+                    </div>
+
                     {inProgressFaults.length > 0 && (
                       <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-6">
                         <h2 className="font-bold text-yellow-800 mb-3">Currently Working On ({inProgressFaults.length})</h2>
@@ -790,6 +853,16 @@
                         <CheckCircle />
                       </div>
                     </div>
+
+                    <div className="bg-purple-50 rounded-lg p-4">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="text-sm text-gray-600">Tokens Generated</p>
+                          <p className="text-3xl font-bold text-purple-600">{tokens.length}</p>
+                        </div>
+                        <Phone />
+                      </div>
+                    </div>
                   </div>
 
                   <div className="bg-gray-50 rounded-lg p-6 mb-6">
@@ -879,6 +952,15 @@
                                     resolvedFaults.length) *
                                     100
                                 )
+                              : 0}
+                            %
+                          </p>
+                        </div>
+                        <div className="bg-white p-3 rounded">
+                          <p className="text-sm text-gray-600 mb-1">Token to Fault Ratio</p>
+                          <p className="text-2xl font-bold text-purple-600">
+                            {faults.length > 0
+                              ? ((tokens.length / faults.length) * 100).toFixed(1)
                               : 0}
                             %
                           </p>
