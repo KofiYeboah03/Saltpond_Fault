@@ -56,9 +56,7 @@
         const PRIORITY_LEVELS = ['Critical', 'High', 'Medium', 'Low'];
         
         const AUTH_CODES = {
-          'CME1111': 'CME1',
-          'CME2222': 'CME2',
-          'CME3333': 'CME3',
+          'SP01F': 'cme',
           'OFORI4422': 'Ofori',
           'DANIEL9898': 'Daniel',
           'DAVID4545': 'David',
@@ -107,19 +105,16 @@
 
           const handleAuthCodeSubmit = () => {
             const upperCode = authCode.toUpperCase().trim();
-            console.log('Trying code:', upperCode);
-            console.log('Available codes:', AUTH_CODES);
             
             if (AUTH_CODES[upperCode]) {
               const role = AUTH_CODES[upperCode];
-              console.log('Role:', role);
               
               if (role === 'officer') {
                 setUserRole('officer');
                 setUserName('DTO');
-              } else if (CME_MEMBERS.includes(role)) {
+              } else if (role === 'cme') {
                 setUserRole('cme');
-                setUserName(role);
+                setUserName('CME');
               } else {
                 setUserRole('field');
                 setUserName(role);
@@ -127,7 +122,7 @@
               setAuthCode('');
               setAuthError('');
             } else {
-              setAuthError('Invalid access code. Please try again. Try: DTO1122, CME1111, OFORI4422');
+              setAuthError('Invalid access code. Try: SP01F, DTO1122, OFORI4422');
             }
           };
 
@@ -281,6 +276,14 @@
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
+          };
+
+          const getResolutionTime = (fault) => {
+            if (!fault.reported_time || !fault.resolved_time) return null;
+            const reported = new Date(fault.reported_time);
+            const resolved = new Date(fault.resolved_time);
+            const minutes = Math.round((resolved - reported) / (1000 * 60));
+            return minutes >= 0 ? minutes : 0;
           };
 
           const handleExportAllFaults = () => {
@@ -492,7 +495,7 @@
                     <div className="flex justify-between items-center mb-6">
                       <div>
                         <h1 className="text-2xl font-bold text-gray-800">Call Line Entry</h1>
-                        <p className="text-gray-600">CME: {userName}</p>
+                        <p className="text-gray-600">CME Staff</p>
                       </div>
                       <button
                         onClick={() => {
@@ -1274,7 +1277,7 @@
             );
           }
 
-          // Officer Dashboard
+          // Officer Dashboard continues in next part...
           const resolvedFaults = faults.filter(f => f.status === 'resolved');
           const pendingFaults = faults.filter(f => f.status === 'pending');
           const inProgressFaults = faults.filter(f => f.status === 'in-progress');
@@ -1283,14 +1286,6 @@
           const postpaidFaults = faults.filter(f => f.meter_type === 'Postpaid');
           const prepaidResolved = resolvedFaults.filter(f => f.meter_type === 'Prepaid');
           const postpaidResolved = resolvedFaults.filter(f => f.meter_type === 'Postpaid');
-
-          const getResolutionTime = (fault) => {
-            if (!fault.reported_time || !fault.resolved_time) return null;
-            const reported = new Date(fault.reported_time);
-            const resolved = new Date(fault.resolved_time);
-            const minutes = Math.round((resolved - reported) / (1000 * 60));
-            return minutes >= 0 ? minutes : 0;
-          };
 
           const teamStats = FAULT_TEAM_MEMBERS.reduce((acc, member) => {
             const memberFaults = faults.filter(f => f.team_member === member);
@@ -1335,37 +1330,37 @@
                                 onClick={handleExportAllFaults}
                                 className="w-full text-left px-4 py-2 hover:bg-gray-100 rounded text-sm"
                               >
-                                All Faults
+                                📋 All Faults
                               </button>
                               <button
                                 onClick={handleExportResolvedFaults}
                                 className="w-full text-left px-4 py-2 hover:bg-gray-100 rounded text-sm"
                               >
-                                Resolved Faults
+                                ✅ Resolved Faults
                               </button>
                               <button
                                 onClick={handleExportPendingFaults}
                                 className="w-full text-left px-4 py-2 hover:bg-gray-100 rounded text-sm"
                               >
-                                Pending Faults
+                                ⏳ Pending Faults
                               </button>
                               <button
                                 onClick={handleExportTokens}
                                 className="w-full text-left px-4 py-2 hover:bg-gray-100 rounded text-sm"
                               >
-                                Token Generations
+                                🎫 Token Generations
                               </button>
                               <button
                                 onClick={handleExportTeamPerformance}
                                 className="w-full text-left px-4 py-2 hover:bg-gray-100 rounded text-sm"
                               >
-                                Team Performance
+                                👥 Team Performance
                               </button>
                               <button
                                 onClick={handleExportLocationStats}
                                 className="w-full text-left px-4 py-2 hover:bg-gray-100 rounded text-sm"
                               >
-                                Location Statistics
+                                📍 Location Statistics
                               </button>
                             </div>
                           </div>
@@ -1654,7 +1649,7 @@
                     </div>
                   </div>
 
-                 <div className="bg-gray-50 rounded-lg p-6 mb-6">
+                  <div className="bg-gray-50 rounded-lg p-6 mb-6">
                     <h2 className="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
                       <TrendingUp />
                       Key Metrics
